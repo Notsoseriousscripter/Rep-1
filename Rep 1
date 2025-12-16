@@ -1,0 +1,520 @@
+-- SERVICES
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+
+local LocalPlayer = Players.LocalPlayer
+local Remote = ReplicatedStorage:WaitForChild("game_folder"):WaitForChild("remote"):WaitForChild("ability_remote")
+
+-- STATE
+local SelectedPlayers = {}
+local KillAuraEnabled, FireEnabled, HailMaryEnabled, CounterEnabled = false, false, false, false
+local AuraRadius = 20
+local allSelected = false
+local UIColor = Color3.fromRGB(25,25,25)
+local UITransparency = 0
+local RGBMode, GradientMode = false, false
+local RGBHue = 0
+local CharacterButtonsEnabled = false
+local DraggableCharacterButtons = {}
+
+local CharactersList = {"Angstrom","AtomEve","Powerplex","BattleBeast","TechJacket","Viltrumite"}
+
+-- GUI ROOT
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "MainGui"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+-- OPEN BUTTON
+local OpenButton = Instance.new("ImageButton")
+OpenButton.Size = UDim2.fromOffset(55,55)
+OpenButton.Position = UDim2.fromScale(0.03,0.5)
+OpenButton.AnchorPoint = Vector2.new(0,0.5)
+OpenButton.Image = "rbxassetid://112516341481113"
+OpenButton.BackgroundColor3 = Color3.fromRGB(50,50,50)
+OpenButton.BorderSizePixel = 0
+OpenButton.Parent = ScreenGui
+Instance.new("UICorner", OpenButton).CornerRadius = UDim.new(1,0)
+
+-- MAIN MENU
+local Menu = Instance.new("Frame")
+Menu.Size = UDim2.fromOffset(320,480)
+Menu.Position = UDim2.fromScale(0.5,0.5)
+Menu.AnchorPoint = Vector2.new(0.5,0.5)
+Menu.Visible = false
+Menu.BackgroundColor3 = UIColor
+Menu.BackgroundTransparency = UITransparency
+Menu.BorderSizePixel = 0
+Menu.Parent = ScreenGui
+Instance.new("UICorner", Menu).CornerRadius = UDim.new(0,20)
+
+-- STORE ORIGINAL SIZES & POSITIONS
+local originalSizes = {}
+local originalPositions = {}
+local function storeOriginals(obj)
+    originalSizes[obj] = {XScale=obj.Size.X.Scale, XOffset=obj.Size.X.Offset,
+                          YScale=obj.Size.Y.Scale, YOffset=obj.Size.Y.Offset}
+    originalPositions[obj] = {XScale=obj.Position.X.Scale, XOffset=obj.Position.X.Offset,
+                              YScale=obj.Position.Y.Scale, YOffset=obj.Position.Y.Offset}
+end
+
+-- RESCALE FUNCTION
+local function rescaleMenu(scale)
+    Menu.Size = UDim2.new(0,320*scale,0,480*scale)
+    for obj, s in pairs(originalSizes) do
+        local p = originalPositions[obj]
+        obj.Size = UDim2.new(s.XScale,s.XOffset*scale,s.YScale,s.YOffset*scale)
+        obj.Position = UDim2.new(p.XScale,p.XOffset*scale,p.YScale,p.YOffset*scale)
+    end
+end
+
+-- TABS
+local TabsFrame = Instance.new("Frame")
+TabsFrame.Size = UDim2.new(1,0,0,40)
+TabsFrame.BackgroundTransparency = 1
+TabsFrame.Position = UDim2.new(0,0,0,0)
+TabsFrame.Parent = Menu
+
+local function createTab(name,pos)
+    local tab = Instance.new("TextButton")
+    tab.Size = UDim2.new(0.25,-2,1,0)
+    tab.Position = pos
+    tab.BackgroundColor3 = Color3.fromRGB(60,60,60)
+    tab.BorderSizePixel = 0
+    tab.Text = name
+    tab.TextScaled = true
+    tab.TextColor3 = Color3.new(1,1,1)
+    tab.Font = Enum.Font.GothamSemibold
+    Instance.new("UICorner", tab).CornerRadius = UDim.new(0,8)
+    tab.Parent = TabsFrame
+    storeOriginals(tab)
+    return tab
+end
+
+local PlayerTab = createTab("Players", UDim2.fromScale(0,0))
+local AurasTab = createTab("Auras", UDim2.fromScale(0.25,0))
+local SettingsTab = createTab("Settings", UDim2.fromScale(0.5,0))
+local CharacterTab = createTab("Character", UDim2.fromScale(0.75,0))
+
+-- FRAMES
+local function createFrame()
+    local f = Instance.new("Frame")
+    f.Size = UDim2.new(1,0,1,-40)
+    f.Position = UDim2.fromOffset(0,40)
+    f.BackgroundTransparency = 1
+    f.Visible = false
+    f.Parent = Menu
+    storeOriginals(f)
+    return f
+end
+
+local PlayerFrame = createFrame(); PlayerFrame.Visible = true
+local AuraFrame = createFrame()
+local SettingsFrame = createFrame()
+local CharacterFrame = createFrame()
+
+-- PLAYER LIST
+local PlayerList = Instance.new("ScrollingFrame")
+PlayerList.Position = UDim2.fromOffset(10,10)
+PlayerList.Size = UDim2.new(1,-20,1,-95)
+PlayerList.ScrollBarThickness = 6
+PlayerList.BackgroundTransparency = 1
+PlayerList.Parent = PlayerFrame
+storeOriginals(PlayerList)
+local PlayerListLayout = Instance.new("UIListLayout", PlayerList)
+PlayerListLayout.Padding = UDim.new(0,8)
+PlayerListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+-- SELECT ALL BUTTON
+local SelectAll = Instance.new("TextButton")
+SelectAll.Size = UDim2.new(1,-20,0,35)
+SelectAll.Position = UDim2.new(0,10,1,-55)
+SelectAll.Text = "Select All"
+SelectAll.TextScaled = true
+SelectAll.BackgroundColor3 = Color3.fromRGB(100,100,100)
+SelectAll.TextColor3 = Color3.new(1,1,1)
+SelectAll.Font = Enum.Font.GothamSemibold
+SelectAll.Parent = PlayerFrame
+Instance.new("UICorner", SelectAll)
+storeOriginals(SelectAll)
+
+-- FIRE TOGGLE BUTTON
+local FireToggle = Instance.new("TextButton")
+FireToggle.Size = UDim2.new(1,-20,0,35)
+FireToggle.Position = UDim2.new(0,10,1,-95)
+FireToggle.Text = "Fire: OFF"
+FireToggle.TextScaled = true
+FireToggle.BackgroundColor3 = Color3.fromRGB(70,140,70)
+FireToggle.TextColor3 = Color3.new(1,1,1)
+FireToggle.Font = Enum.Font.GothamSemibold
+FireToggle.Parent = PlayerFrame
+Instance.new("UICorner", FireToggle)
+storeOriginals(FireToggle)
+
+-- AURA BUTTONS
+local function createAuraButton(name,pos,color)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1,-20,0,40)
+    btn.Position = pos
+    btn.Text = name.." : OFF"
+    btn.TextScaled = true
+    btn.BackgroundColor3 = color
+    btn.TextColor3 = Color3.new(1,1,1)
+    btn.Font = Enum.Font.GothamSemibold
+    btn.Parent = AuraFrame
+    Instance.new("UICorner", btn)
+    storeOriginals(btn)
+    return btn
+end
+
+local KillAuraToggle = createAuraButton("Kill Aura", UDim2.fromOffset(10,10), Color3.fromRGB(120,60,60))
+local HailMaryToggle = createAuraButton("Hail Mary 👹", UDim2.fromOffset(10,60), Color3.fromRGB(140,60,60))
+local CounterToggle = createAuraButton("Counter", UDim2.fromOffset(10,110), Color3.fromRGB(60,120,180))
+
+-- RANGE INPUT
+local RangeInput = Instance.new("TextBox")
+RangeInput.Size = UDim2.new(1,-20,0,35)
+RangeInput.Position = UDim2.fromOffset(10,160)
+RangeInput.PlaceholderText = "Aura Range (Max 2000)"
+RangeInput.TextColor3 = Color3.new(1,1,1)
+RangeInput.BackgroundColor3 = Color3.fromRGB(50,50,50)
+RangeInput.TextScaled = true
+RangeInput.Font = Enum.Font.GothamSemibold
+RangeInput.Parent = AuraFrame
+Instance.new("UICorner", RangeInput)
+storeOriginals(RangeInput)
+
+RangeInput.FocusLost:Connect(function()
+    local val = tonumber(RangeInput.Text)
+    if val then AuraRadius = math.clamp(val,1,2000) end
+end)
+
+-- SETTINGS
+local function createSettingLabel(name,pos)
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.new(1,-20,0,30)
+    lbl.Position = pos
+    lbl.Text = name
+    lbl.TextScaled = true
+    lbl.TextColor3 = Color3.new(1,1,1)
+    lbl.BackgroundTransparency = 1
+    lbl.Font = Enum.Font.GothamSemibold
+    lbl.Parent = SettingsFrame
+    storeOriginals(lbl)
+    return lbl
+end
+
+local ColorLabel = createSettingLabel("UI Color", UDim2.fromOffset(10,10))
+local TransparencyLabel = createSettingLabel("UI Transparency (0-1)", UDim2.fromOffset(10,80))
+local SizeLabel = createSettingLabel("UI Size (%)", UDim2.fromOffset(10,150))
+
+local ColorInput = Instance.new("TextBox")
+ColorInput.Size = UDim2.new(1,-20,0,30)
+ColorInput.Position = UDim2.fromOffset(10,40)
+ColorInput.PlaceholderText = "Enter RGB: 255,0,0"
+ColorInput.TextColor3 = Color3.new(1,1,1)
+ColorInput.BackgroundColor3 = Color3.fromRGB(40,40,40)
+ColorInput.TextScaled = true
+ColorInput.Font = Enum.Font.GothamSemibold
+ColorInput.Parent = SettingsFrame
+Instance.new("UICorner", ColorInput)
+storeOriginals(ColorInput)
+ColorInput.FocusLost:Connect(function()
+    local r,g,b = string.match(ColorInput.Text,"(%d+),%s*(%d+),%s*(%d+)")
+    r,g,b = tonumber(r), tonumber(g), tonumber(b)
+    if r and g and b then
+        UIColor = Color3.fromRGB(r,g,b)
+        Menu.BackgroundColor3 = UIColor
+    end
+end)
+
+local TransparencyInput = Instance.new("TextBox")
+TransparencyInput.Size = UDim2.new(1,-20,0,30)
+TransparencyInput.Position = UDim2.fromOffset(10,110)
+TransparencyInput.PlaceholderText = "0-1"
+TransparencyInput.TextColor3 = Color3.new(1,1,1)
+TransparencyInput.BackgroundColor3 = Color3.fromRGB(40,40,40)
+TransparencyInput.TextScaled = true
+TransparencyInput.Font = Enum.Font.GothamSemibold
+TransparencyInput.Parent = SettingsFrame
+Instance.new("UICorner", TransparencyInput)
+storeOriginals(TransparencyInput)
+TransparencyInput.FocusLost:Connect(function()
+    local val = tonumber(TransparencyInput.Text)
+    if val then
+        UITransparency = math.clamp(val,0,1)
+        Menu.BackgroundTransparency = UITransparency
+    end
+end)
+
+local SizeInput = Instance.new("TextBox")
+SizeInput.Size = UDim2.new(1,-20,0,35)
+SizeInput.Position = UDim2.fromOffset(10,180)
+SizeInput.PlaceholderText = "100 for default"
+SizeInput.TextColor3 = Color3.new(1,1,1)
+SizeInput.BackgroundColor3 = Color3.fromRGB(40,40,40)
+SizeInput.TextScaled = true
+SizeInput.Font = Enum.Font.GothamSemibold
+SizeInput.Parent = SettingsFrame
+Instance.new("UICorner", SizeInput)
+storeOriginals(SizeInput)
+SizeInput.FocusLost:Connect(function()
+    local val = tonumber(SizeInput.Text)
+    if val then rescaleMenu(math.clamp(val,50,200)/100) end
+end)
+
+-- CHARACTER TAB
+local CharacterInput = Instance.new("TextBox")
+CharacterInput.Size = UDim2.new(1,-20,0,35)
+CharacterInput.Position = UDim2.fromOffset(10,10)
+CharacterInput.PlaceholderText = "Enter character name"
+CharacterInput.TextColor3 = Color3.new(1,1,1)
+CharacterInput.BackgroundColor3 = Color3.fromRGB(50,50,50)
+CharacterInput.TextScaled = true
+CharacterInput.Font = Enum.Font.GothamSemibold
+CharacterInput.Parent = CharacterFrame
+Instance.new("UICorner", CharacterInput)
+storeOriginals(CharacterInput)
+CharacterInput.FocusLost:Connect(function()
+    local val = CharacterInput.Text
+    if val and #val>0 then
+        pcall(function()
+            LocalPlayer.Settings.moveset.Value = val
+        end)
+    end
+end)
+
+-- SCROLLING FRAME FOR CHARACTERS
+local CharacterScroll = Instance.new("ScrollingFrame")
+CharacterScroll.Position = UDim2.fromOffset(10,55)
+CharacterScroll.Size = UDim2.new(1,-20,1,-65)
+CharacterScroll.ScrollBarThickness = 6
+CharacterScroll.BackgroundTransparency = 1
+CharacterScroll.Parent = CharacterFrame
+storeOriginals(CharacterScroll)
+local CharacterListLayout = Instance.new("UIListLayout", CharacterScroll)
+CharacterListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+CharacterListLayout.Padding = UDim.new(0,5)
+
+-- POPULATE CHARACTER LIST
+for _,name in ipairs(CharactersList) do
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1,0,0,35)
+    btn.Text = name
+    btn.TextColor3 = Color3.new(1,1,1)
+    btn.TextScaled = true
+    btn.BackgroundColor3 = Color3.fromRGB(70,70,70)
+    btn.Font = Enum.Font.GothamSemibold
+    btn.Parent = CharacterScroll
+    Instance.new("UICorner", btn)
+    btn.MouseButton1Click:Connect(function()
+        CharacterInput.Text = name
+        pcall(function() LocalPlayer.Settings.moveset.Value = name end)
+    end)
+end
+CharacterScroll.CanvasSize = UDim2.new(0,0,0,CharacterListLayout.AbsoluteContentSize.Y+5)
+
+-- DRAGGABLE BUTTONS TOGGLE
+local CharacterToggle = Instance.new("TextButton")
+CharacterToggle.Size = UDim2.new(1,-20,0,35)
+CharacterToggle.Position = UDim2.fromOffset(10,10)
+CharacterToggle.Text = "Draggable Character Buttons: OFF"
+CharacterToggle.TextScaled = true
+CharacterToggle.BackgroundColor3 = Color3.fromRGB(70,140,70)
+CharacterToggle.TextColor3 = Color3.new(1,1,1)
+CharacterToggle.Font = Enum.Font.GothamSemibold
+CharacterToggle.Parent = CharacterFrame
+Instance.new("UICorner", CharacterToggle)
+storeOriginals(CharacterToggle)
+CharacterToggle.MouseButton1Click:Connect(function()
+    CharacterButtonsEnabled = not CharacterButtonsEnabled
+    CharacterToggle.Text = "Draggable Character Buttons: "..(CharacterButtonsEnabled and "ON" or "OFF")
+    if CharacterButtonsEnabled then
+        -- Create buttons if not exist
+        for _,name in ipairs(CharactersList) do
+            if not DraggableCharacterButtons[name] then
+                local btn = Instance.new("TextButton")
+                btn.Size = UDim2.fromOffset(40,40)
+                btn.Position = UDim2.fromOffset(100,100)
+                btn.Text = name
+                btn.TextScaled = true
+                btn.BackgroundColor3 = Color3.fromRGB(80,80,80)
+                btn.TextColor3 = Color3.new(1,1,1)
+                btn.Parent = ScreenGui
+                Instance.new("UICorner", btn)
+                btn.Draggable = true
+                btn.Active = true
+                btn.MouseButton1Click:Connect(function()
+                    CharacterInput.Text = name
+                    pcall(function() LocalPlayer.Settings.moveset.Value = name end)
+                end)
+                DraggableCharacterButtons[name] = btn
+            end
+        end
+    else
+        -- Remove buttons
+        for _,btn in pairs(DraggableCharacterButtons) do
+            btn:Destroy()
+        end
+        DraggableCharacterButtons = {}
+    end
+end)
+
+-- TAB SWITCHING
+local function hideAllFrames()
+    PlayerFrame.Visible = false
+    AuraFrame.Visible = false
+    SettingsFrame.Visible = false
+    CharacterFrame.Visible = false
+end
+PlayerTab.MouseButton1Click:Connect(function()
+    hideAllFrames()
+    PlayerFrame.Visible = true
+end)
+AurasTab.MouseButton1Click:Connect(function()
+    hideAllFrames()
+    AuraFrame.Visible = true
+end)
+SettingsTab.MouseButton1Click:Connect(function()
+    hideAllFrames()
+    SettingsFrame.Visible = true
+end)
+CharacterTab.MouseButton1Click:Connect(function()
+    hideAllFrames()
+    CharacterFrame.Visible = true
+end)
+
+-- OPEN BUTTON
+OpenButton.MouseButton1Click:Connect(function()
+    Menu.Visible = not Menu.Visible
+end)
+
+-- PLAYER LIST REFRESH
+local function refreshPlayerList()
+    for _, c in ipairs(PlayerList:GetChildren()) do
+        if c:IsA("TextButton") then c:Destroy() end
+    end
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer then
+            local btn = Instance.new("TextButton")
+            btn.Size = UDim2.new(1,-4,0,35)
+            btn.Text = plr.Name
+            btn.TextColor3 = Color3.new(1,1,1)
+            btn.TextScaled = true
+            btn.BackgroundColor3 = SelectedPlayers[plr] and Color3.fromRGB(80,140,80) or Color3.fromRGB(50,50,50)
+            btn.Parent = PlayerList
+            Instance.new("UICorner", btn)
+            btn.MouseButton1Click:Connect(function()
+                SelectedPlayers[plr] = not SelectedPlayers[plr]
+                btn.BackgroundColor3 = SelectedPlayers[plr] and Color3.fromRGB(80,140,80) or Color3.fromRGB(50,50,50)
+            end)
+        end
+    end
+    PlayerList.CanvasSize = UDim2.new(0,0,0,PlayerListLayout.AbsoluteContentSize.Y+6)
+end
+
+-- SELECT ALL FUNCTION
+SelectAll.MouseButton1Click:Connect(function()
+    allSelected = not allSelected
+    for _,plr in ipairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer then SelectedPlayers[plr] = allSelected end
+    end
+    SelectAll.Text = allSelected and "Deselect All" or "Select All"
+    refreshPlayerList()
+end)
+
+-- FIRE TOGGLE
+FireToggle.MouseButton1Click:Connect(function()
+    FireEnabled = not FireEnabled
+    FireToggle.Text = "Fire: "..(FireEnabled and "ON" or "OFF")
+    FireToggle.BackgroundColor3 = FireEnabled and Color3.fromRGB(120,200,120) or Color3.fromRGB(70,140,70)
+end)
+
+-- AURA TOGGLES
+KillAuraToggle.MouseButton1Click:Connect(function()
+    KillAuraEnabled = not KillAuraEnabled
+    KillAuraToggle.Text = "Kill Aura: "..(KillAuraEnabled and "ON" or "OFF")
+    KillAuraToggle.BackgroundColor3 = KillAuraEnabled and Color3.fromRGB(60,140,60) or Color3.fromRGB(120,60,60)
+end)
+HailMaryToggle.MouseButton1Click:Connect(function()
+    HailMaryEnabled = not HailMaryEnabled
+    HailMaryToggle.Text = "Hail Mary 👹: "..(HailMaryEnabled and "ON" or "OFF")
+    HailMaryToggle.BackgroundColor3 = HailMaryEnabled and Color3.fromRGB(200,100,100) or Color3.fromRGB(140,60,60)
+end)
+CounterToggle.MouseButton1Click:Connect(function()
+    CounterEnabled = not CounterEnabled
+    CounterToggle.Text = "Counter: "..(CounterEnabled and "ON" or "OFF")
+    CounterToggle.BackgroundColor3 = CounterEnabled and Color3.fromRGB(80,160,200) or Color3.fromRGB(60,120,180)
+end)
+
+-- PLAYER JOIN/LEAVE
+Players.PlayerAdded:Connect(function(plr)
+    if plr ~= LocalPlayer then
+        SelectedPlayers[plr] = true
+        allSelected = true
+        SelectAll.Text = "Deselect All"
+        if Menu.Visible then task.wait(0.2); refreshPlayerList() end
+    end
+end)
+Players.PlayerRemoving:Connect(function(plr)
+    SelectedPlayers[plr] = nil
+    if Menu.Visible then refreshPlayerList() end
+end)
+
+-- MAIN LOOP
+spawn(function()
+    while true do
+        local char = LocalPlayer.Character
+        local hrp = char and char:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            if FireEnabled then
+                for plr, sel in pairs(SelectedPlayers) do
+                    if sel and plr.Character then
+                        Remote:FireServer("Viltrumite","M1",plr.Character,"BoostCombatEnd",1,103074409872436.2)
+                    end
+                end
+            end
+            if KillAuraEnabled then
+                for _, plr in ipairs(Players:GetPlayers()) do
+                    if plr ~= LocalPlayer and plr.Character then
+                        local h = plr.Character:FindFirstChild("HumanoidRootPart")
+                        if h and (h.Position - hrp.Position).Magnitude <= AuraRadius then
+                            Remote:FireServer("Viltrumite","M1",plr.Character,"BoostCombatEnd",1,103074409872436.2)
+                        end
+                    end
+                end
+            end
+            if HailMaryEnabled then
+                local target = Workspace.Characters:FindFirstChild("HailMaryOfficial")
+                local hit = target and target:FindFirstChild("Hitboxes") and target.Hitboxes:FindFirstChild("LeftLegSpot")
+                if target and hit then
+                    local args = {[1]="Viltrumite",[2]="CustomRigHit",[3]=target,[4]=hit,[5]="BoostHit"}
+                    Remote:FireServer(unpack(args))
+                end
+            end
+            if CounterEnabled then
+                local args = {[1]="Viltrumite",[2]="Counter",[4]="CounterAdd",[6]=103074409885808.81}
+                Remote:FireServer(unpack(args))
+            end
+        end
+        task.wait(0.05)
+    end
+end)
+
+-- RGB / Gradient
+RunService.RenderStepped:Connect(function()
+    if RGBMode then
+        RGBHue = (RGBHue + 1) % 360
+        Menu.BackgroundColor3 = Color3.fromHSV(RGBHue/360,1,1)
+    end
+    if GradientMode then
+        local r = tick()%1
+        Menu.BackgroundColor3 = Color3.fromHSV(r,1,1)
+    end
+end)
+
+task.wait(0.2)
+refreshPlayerList()
