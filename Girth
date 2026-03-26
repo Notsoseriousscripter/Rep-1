@@ -136,14 +136,15 @@ local ThunderFarm=false
 local TweenSpeed = 0.6
 local AutoFarmPlayers=false
 local FarmMode="Both"
-
+local PureAura=false   -- ✅ ADDED
+        
 ShifterSection:Toggle({Title="Titan Shifter Kill Aura",Callback=function(v)KillAura=v PlayClick()end})        
 ShifterSection:Toggle({Title="Damage Boost",Callback=function(v)DamageBoost=v PlayClick()end})        
 ShifterSection:Toggle({Title="Shifter ESP",Callback=function(v)ShifterESP=v PlayClick()end})        
 ShifterSection:Toggle({Title="Tracers",Callback=function(v)Tracers=v PlayClick()end})        
 ShifterSection:Toggle({Title="Thunderspear Auto Farm",Callback=function(v)ThunderFarm=v PlayClick()end})        
 
--- 🔥 NEW SLIDER (tween speed)
+-- Tween speed slider
 ShifterSection:Slider({
     Title="Tween Speed",
     Step=0.1,
@@ -152,7 +153,7 @@ ShifterSection:Slider({
 })
 
 --------------------------------------------------
--- 🔥 AMMO SECTION (NEW)
+-- AMMO SECTION
 --------------------------------------------------
 local AmmoSection = AntiGroup:Section({
     Title="Ammo",
@@ -170,7 +171,7 @@ AmmoSection:Toggle({Title="Infinite Thunderspear",Callback=function(v)InfSpear=v
 AmmoSection:Toggle({Title="Infinite Gas",Callback=function(v)InfGas=v end})
 
 --------------------------------------------------
--- 🔥 PLAYERS SECTION (NEW)
+-- PLAYERS SECTION
 --------------------------------------------------
 local PlayerSection = AntiGroup:Section({
     Title="Players",
@@ -188,6 +189,12 @@ PlayerSection:Dropdown({
     Title="Farm Mode",
     Values={"Players","Titans","Both"},
     Callback=function(v)FarmMode=v end
+})
+
+-- ✅ PURE TITAN AURA TOGGLE (ADDED)
+PlayerSection:Toggle({
+    Title="Pure Titan Kill Aura",
+    Callback=function(v)PureAura=v end
 })
 
 --------------------------------------------------
@@ -226,6 +233,24 @@ RunService.RenderStepped:Connect(function()
     local myChar=LocalPlayer.Character
     local myRoot=myChar and myChar:FindFirstChild("HumanoidRootPart")
 
+    --------------------------------------------------
+    -- PURE TITAN KILL AURA (ADDED)
+    --------------------------------------------------
+    if PureAura and myRoot then
+        local pureFolder = workspace:FindFirstChild("Objects")
+            and workspace.Objects:FindFirstChild("Titans")
+            and workspace.Objects.Titans:FindFirstChild("Pure")
+
+        if pureFolder then
+            for _, titan in pairs(pureFolder:GetChildren()) do
+                local nape = titan:FindFirstChild("Nape")
+                if nape and (nape.Position - myRoot.Position).Magnitude <= 150 then
+                    ReplicatedStorage.Remotes.Blades.Hit:FireServer(nape,999)
+                end
+            end
+        end
+    end
+
     for _,plr in ipairs(Players:GetPlayers()) do
         if plr==LocalPlayer then continue end
         if Settings.TeamCheck and plr.Team==LocalPlayer.Team then continue end
@@ -243,7 +268,7 @@ RunService.RenderStepped:Connect(function()
                 ReplicatedStorage.Remotes.Blades.Hit:FireServer(nape,DamageBoost and 999 or 686)
             end
 
-            -- Thunder Farm (FIXED)
+            -- Thunder Farm (LEFT ONLY + 4/sec + 80 studs + tween speed)
             if ThunderFarm and myRoot then
                 local targetPos = nape.Position - (nape.CFrame.LookVector * 80)
 
@@ -282,7 +307,7 @@ RunService.RenderStepped:Connect(function()
                 Boxes[plr].Visible=false
             end
 
-            -- Tracers FIX
+            -- Tracers
             if Tracers and vis then
                 if not Lines[plr] then
                     local l=Drawing.new("Line")
@@ -300,7 +325,7 @@ RunService.RenderStepped:Connect(function()
             end
         end
 
-        -- PLAYER AUTOFARM
+        -- PLAYER AUTOFARM (TOOLS ONLY + TEAM CHECK)
         if AutoFarmPlayers and myRoot and char and hitbox and HasTool(plr) then
             if FarmMode=="Players" or FarmMode=="Both" then
                 TweenService:Create(
@@ -313,7 +338,7 @@ RunService.RenderStepped:Connect(function()
             end
         end
 
-        -- TITAN FARM MODE
+        -- TITAN FARM MODE (NO ARMORED)
         if AutoFarmPlayers and nape then
             if FarmMode=="Titans" or FarmMode=="Both" then
                 TweenService:Create(
