@@ -87,7 +87,15 @@ AimTab:Toggle({Title="Enable Aimbot",Default=true,Callback=function(v)Settings.E
 AimTab:Toggle({Title="Enable ESP",Default=true,Callback=function(v)Settings.ESPEnabled=v PlayClick()end})        
 AimTab:Toggle({Title="Show FOV Circle",Default=true,Callback=function(v)Settings.ShowFOV=v PlayClick()end})        
         
-AimTab:Slider({Title="FOV",Step=1,Value={Min=0,Max=400,Default=200},Callback=function(v)Settings.FOV=v end})        
+AimTab:Slider({
+    Title="FOV",
+    Step=1,
+    Value={Min=0,Max=400,Default=200},
+    Callback=function(v)
+        Settings.FOV=v
+        PlayClick()
+    end
+})
         
 AimTab:Section({Title="Shifters"})        
 AimTab:Paragraph({Title="Shifter System",Desc="",Thumbnail=ShifterImage})        
@@ -98,7 +106,10 @@ local SelectedTitan=nil
 TitanSection:Dropdown({        
     Title="Select Titan",        
     Values={"Warhammer","Colossal","Beast","Attack","Female","Jaw","Armored"},        
-    Callback=function(v)SelectedTitan=v PlayClick()end        
+    Callback=function(v)
+        SelectedTitan=v 
+        PlayClick()
+    end        
 })        
         
 TitanSection:Button({        
@@ -132,11 +143,10 @@ local ShifterESP=false
 local Tracers=false        
 local ThunderFarm=false        
         
--- 🔥 NEW
 local TweenSpeed = 0.6
 local AutoFarmPlayers=false
 local FarmMode="Both"
-local PureAura=false   -- ✅ ADDED
+local PureAura=false
         
 ShifterSection:Toggle({Title="Titan Shifter Kill Aura",Callback=function(v)KillAura=v PlayClick()end})        
 ShifterSection:Toggle({Title="Damage Boost",Callback=function(v)DamageBoost=v PlayClick()end})        
@@ -144,12 +154,14 @@ ShifterSection:Toggle({Title="Shifter ESP",Callback=function(v)ShifterESP=v Play
 ShifterSection:Toggle({Title="Tracers",Callback=function(v)Tracers=v PlayClick()end})        
 ShifterSection:Toggle({Title="Thunderspear Auto Farm",Callback=function(v)ThunderFarm=v PlayClick()end})        
 
--- Tween speed slider
 ShifterSection:Slider({
     Title="Tween Speed",
     Step=0.1,
     Value={Min=0.1,Max=2,Default=0.6},
-    Callback=function(v)TweenSpeed=v end
+    Callback=function(v)
+        TweenSpeed=v
+        PlayClick()
+    end
 })
 
 --------------------------------------------------
@@ -166,9 +178,9 @@ local InfBlade=false
 local InfSpear=false
 local InfGas=false
 
-AmmoSection:Toggle({Title="Infinite Blades",Callback=function(v)InfBlade=v end})
-AmmoSection:Toggle({Title="Infinite Thunderspear",Callback=function(v)InfSpear=v end})
-AmmoSection:Toggle({Title="Infinite Gas",Callback=function(v)InfGas=v end})
+AmmoSection:Toggle({Title="Infinite Blades",Callback=function(v)InfBlade=v PlayClick()end})
+AmmoSection:Toggle({Title="Infinite Thunderspear",Callback=function(v)InfSpear=v PlayClick()end})
+AmmoSection:Toggle({Title="Infinite Gas",Callback=function(v)InfGas=v PlayClick()end})
 
 --------------------------------------------------
 -- PLAYERS SECTION
@@ -182,19 +194,27 @@ local PlayerSection = AntiGroup:Section({
 
 PlayerSection:Toggle({
     Title="Auto Farm Players",
-    Callback=function(v)AutoFarmPlayers=v end
+    Callback=function(v)
+        AutoFarmPlayers=v
+        PlayClick()
+    end
 })
 
 PlayerSection:Dropdown({
     Title="Farm Mode",
     Values={"Players","Titans","Both"},
-    Callback=function(v)FarmMode=v end
+    Callback=function(v)
+        FarmMode=v
+        PlayClick()
+    end
 })
 
--- ✅ PURE TITAN AURA TOGGLE (ADDED)
 PlayerSection:Toggle({
     Title="Pure Titan Kill Aura",
-    Callback=function(v)PureAura=v end
+    Callback=function(v)
+        PureAura=v
+        PlayClick()
+    end
 })
 
 --------------------------------------------------
@@ -234,7 +254,7 @@ RunService.RenderStepped:Connect(function()
     local myRoot=myChar and myChar:FindFirstChild("HumanoidRootPart")
 
     --------------------------------------------------
-    -- PURE TITAN KILL AURA (ADDED)
+    -- PURE TITAN KILL AURA
     --------------------------------------------------
     if PureAura and myRoot then
         local pureFolder = workspace:FindFirstChild("Objects")
@@ -259,16 +279,16 @@ RunService.RenderStepped:Connect(function()
         local char=plr.Character
         local hitbox=char and char:FindFirstChild("PlayerHitbox")
 
+        --------------------------------------------------
         -- SHIFTER LOGIC
+        --------------------------------------------------
         if nape then
             local pos,vis=Camera:WorldToViewportPoint(nape.Position)
 
-            -- Kill Aura
             if KillAura and myRoot and (nape.Position-myRoot.Position).Magnitude<=200 then
                 ReplicatedStorage.Remotes.Blades.Hit:FireServer(nape,DamageBoost and 999 or 686)
             end
 
-            -- Thunder Farm (LEFT ONLY + 4/sec + 80 studs + tween speed)
             if ThunderFarm and myRoot then
                 local targetPos = nape.Position - (nape.CFrame.LookVector * 80)
 
@@ -288,7 +308,6 @@ RunService.RenderStepped:Connect(function()
                 end
             end
 
-            -- ESP
             if ShifterESP and vis then
                 if not Boxes[plr] then
                     local b=Drawing.new("Square")
@@ -307,7 +326,6 @@ RunService.RenderStepped:Connect(function()
                 Boxes[plr].Visible=false
             end
 
-            -- Tracers
             if Tracers and vis then
                 if not Lines[plr] then
                     local l=Drawing.new("Line")
@@ -325,7 +343,9 @@ RunService.RenderStepped:Connect(function()
             end
         end
 
-        -- PLAYER AUTOFARM (TOOLS ONLY + TEAM CHECK)
+        --------------------------------------------------
+        -- PLAYER AUTOFARM (TOOLS ONLY)
+        --------------------------------------------------
         if AutoFarmPlayers and myRoot and char and hitbox and HasTool(plr) then
             if FarmMode=="Players" or FarmMode=="Both" then
                 TweenService:Create(
@@ -338,7 +358,9 @@ RunService.RenderStepped:Connect(function()
             end
         end
 
-        -- TITAN FARM MODE (NO ARMORED)
+        --------------------------------------------------
+        -- TITAN AUTOFARM (NO ARMORED)
+        --------------------------------------------------
         if AutoFarmPlayers and nape then
             if FarmMode=="Titans" or FarmMode=="Both" then
                 TweenService:Create(
@@ -354,7 +376,7 @@ RunService.RenderStepped:Connect(function()
 end)
 
 --------------------------------------------------
--- 🔥 INFINITE AMMO LOOPS
+-- 🔥 INFINITE AMMO
 --------------------------------------------------
 task.spawn(function()
     while true do
