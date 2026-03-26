@@ -77,9 +77,9 @@ end)
 --------------------------------------------------        
 -- MAIN TAB (UNCHANGED)        
 --------------------------------------------------        
-local AimTab = Window:Tab({Title = "Marleyan", Icon = "crosshair"})          
+local AimTab = Window:Tab({Title = "Main", Icon = "crosshair"})          
         
-AimTab:Paragraph({Title = "Titan Warfare",Desc = "",Thumbnail = TitanImage})        
+AimTab:Paragraph({Title = "Marleyan",Desc = "",Thumbnail = TitanImage})        
         
 local Settings = {Enabled=true,ESPEnabled=true,TeamCheck=true,HitPart="Head",FOV=200,ShowFOV=true}        
         
@@ -124,7 +124,7 @@ TitanSection:Button({
 --------------------------------------------------        
 -- ANTI TITANS        
 --------------------------------------------------        
-local AntiTab = Window:Tab({Title="Eldian OP 🔥",Icon="shield"})        
+local AntiTab = Window:Tab({Title="Anti Titan 🔥",Icon="shield"})        
         
 AntiTab:Paragraph({Title="Anti Titan",Desc="",Thumbnail=AntiImage})        
         
