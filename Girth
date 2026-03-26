@@ -77,7 +77,7 @@ end)
 --------------------------------------------------        
 -- MAIN TAB (UNCHANGED)        
 --------------------------------------------------        
-local AimTab = Window:Tab({Title = "Main", Icon = "crosshair"})          
+local AimTab = Window:Tab({Title = "Marleyan", Icon = "crosshair"})          
         
 AimTab:Paragraph({Title = "Titan Warfare",Desc = "",Thumbnail = TitanImage})        
         
@@ -124,7 +124,7 @@ TitanSection:Button({
 --------------------------------------------------        
 -- ANTI TITANS        
 --------------------------------------------------        
-local AntiTab = Window:Tab({Title="Anti Titans 🔥",Icon="shield"})        
+local AntiTab = Window:Tab({Title="Eldian OP 🔥",Icon="shield"})        
         
 AntiTab:Paragraph({Title="Anti Titan",Desc="",Thumbnail=AntiImage})        
         
