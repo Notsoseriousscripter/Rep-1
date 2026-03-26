@@ -57,9 +57,9 @@ local BackgroundAsset = loadImage("bg.png","https://raw.githubusercontent.com/No
         
 -- WINDOW          
 local Window = WindUI:CreateWindow({          
-    Title = "Aimbot GUI",          
+    Title = "Titan Warfare",          
     Icon = "crosshair",          
-    Author = "by you",          
+    Author = "JS Product",          
     Folder = "AimbotGUI",          
     Size = UDim2.fromOffset(580,460),          
     Theme = "Dark",        
