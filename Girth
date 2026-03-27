@@ -1,92 +1,96 @@
--- WINDUI          
-local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()          
-        
--- SERVICES          
-local Players = game:GetService("Players")          
-local RunService = game:GetService("RunService")          
-local UserInputService = game:GetService("UserInputService")          
-local SoundService = game:GetService("SoundService")          
-local TweenService = game:GetService("TweenService")        
-        
-local LocalPlayer = Players.LocalPlayer          
-local Camera = workspace.CurrentCamera          
-local Mouse = LocalPlayer:GetMouse()          
-        
--- SOUND        
-local ClickSoundId = nil        
-pcall(function()        
-    local getasset = getsynasset or getcustomasset        
-    if getasset and writefile then        
-        local url = "https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/main/ezgif-1065ef8f7c627c89.mp3"        
-        if not isfile("click.mp3") then        
-            writefile("click.mp3", game:HttpGet(url))        
-        end        
-        ClickSoundId = getasset("click.mp3")        
-    end        
-end)        
-        
-local function PlayClick()        
-    if not ClickSoundId then return end        
-    local s = Instance.new("Sound")        
-    s.SoundId = ClickSoundId        
-    s.Volume = 2        
-    s.Parent = SoundService        
-    s:Play()        
-    s.Ended:Connect(function() s:Destroy() end)        
-end        
-        
--- IMAGES        
-local function loadImage(name, url)        
-    local asset = "rbxthumb://type=Asset&id=0&w=420&h=420"        
-    pcall(function()        
-        local getasset = getsynasset or getcustomasset        
-        if getasset and writefile then        
-            if not isfile(name) then        
-                writefile(name, game:HttpGet(url))        
-            end        
-            asset = getasset(name)        
-        end        
-    end)        
-    return asset        
-end        
-        
-local ShifterImage = loadImage("shifter.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/images__18_-removebg-preview.png")        
-local TitanImage   = loadImage("titan.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/noFilter.png")        
-local AntiImage    = loadImage("anti.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/attackontitaneating.png")        
-local BackgroundAsset = loadImage("bg.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/3_20260325_141743_0002.png")        
-        
--- WINDOW          
-local Window = WindUI:CreateWindow({          
-    Title = "Titan Warfare",          
-    Icon = "crosshair",          
-    Author = "JS Product",          
-    Folder = "AimbotGUI",          
-    Size = UDim2.fromOffset(580,460),          
-    Theme = "Dark",        
-    Transparent = true,        
-    Background = BackgroundAsset,        
-    BackgroundImageTransparency = 0.5        
-})          
-        
-pcall(function()        
-    Window:OnTabChanged(function()        
-        PlayClick()        
-    end)        
-end)        
-        
---------------------------------------------------        
--- MAIN TAB (UNCHANGED)        
---------------------------------------------------        
-local AimTab = Window:Tab({Title = "Main", Icon = "crosshair"})          
-        
-AimTab:Paragraph({Title = "Marleyan",Desc = "",Thumbnail = TitanImage})        
-        
-local Settings = {Enabled=true,ESPEnabled=true,TeamCheck=true,HitPart="Head",FOV=200,ShowFOV=true}        
-        
-AimTab:Toggle({Title="Enable Aimbot",Default=true,Callback=function(v)Settings.Enabled=v PlayClick()end})        
-AimTab:Toggle({Title="Enable ESP",Default=true,Callback=function(v)Settings.ESPEnabled=v PlayClick()end})        
-AimTab:Toggle({Title="Show FOV Circle",Default=true,Callback=function(v)Settings.ShowFOV=v PlayClick()end})        
-        
+-- WINDUI  
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()  
+
+-- SERVICES  
+local Players = game:GetService("Players")  
+local RunService = game:GetService("RunService")  
+local UserInputService = game:GetService("UserInputService")  
+local SoundService = game:GetService("SoundService")  
+local TweenService = game:GetService("TweenService")
+
+local LocalPlayer = Players.LocalPlayer  
+local Camera = workspace.CurrentCamera  
+local Mouse = LocalPlayer:GetMouse()  
+
+-- SOUND
+local ClickSoundId = nil
+pcall(function()
+    local getasset = getsynasset or getcustomasset
+    if getasset and writefile then
+        local url = "https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/main/ezgif-1065ef8f7c627c89.mp3"
+        if not isfile("click.mp3") then
+            writefile("click.mp3", game:HttpGet(url))
+        end
+        ClickSoundId = getasset("click.mp3")
+    end
+end)
+
+local function PlayClick()
+    if not ClickSoundId then return end
+    local s = Instance.new("Sound")
+    s.SoundId = ClickSoundId
+    s.Volume = 2
+    s.Parent = SoundService
+    s:Play()
+    s.Ended:Connect(function() s:Destroy() end)
+end
+
+-- IMAGES
+local function loadImage(name, url)
+    local asset = "rbxthumb://type=Asset&id=0&w=420&h=420"
+    pcall(function()
+        local getasset = getsynasset or getcustomasset
+        if getasset and writefile then
+            if not isfile(name) then
+                writefile(name, game:HttpGet(url))
+            end
+            asset = getasset(name)
+        end
+    end)
+    return asset
+end
+
+local WindowIcon = loadImage("win.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/6a50cad53db0ecdea5fcc47343f415fe.png")
+local MainIcon = loadImage("main.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/warrior-unit-marley-attack-on-titan.png")
+local EldianIcon = loadImage("eldian.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/images%20(19)%20(1).png")
+
+local ShifterImage = loadImage("shifter.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/images__18_-removebg-preview.png")
+local TitanImage   = loadImage("titan.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/noFilter.png")
+local AntiImage    = loadImage("anti.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/attackontitaneating.png")
+local BackgroundAsset = loadImage("bg.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/3_20260325_141743_0002.png")
+
+-- WINDOW  
+local Window = WindUI:CreateWindow({  
+    Title = "Aimbot GUI",  
+    Icon = WindowIcon,  
+    Author = "by you",  
+    Folder = "AimbotGUI",  
+    Size = UDim2.fromOffset(580,460),  
+    Theme = "Dark",
+    Transparent = true,
+    Background = BackgroundAsset,
+    BackgroundImageTransparency = 0.5
+})  
+
+pcall(function()
+    Window:OnTabChanged(function()
+        PlayClick()
+    end)
+end)
+
+--------------------------------------------------
+-- MAIN TAB
+--------------------------------------------------
+local AimTab = Window:Tab({Title = "Main", Icon = MainIcon})  
+
+AimTab:Paragraph({Title = "Titan Warfare",Desc = "",Thumbnail = TitanImage})
+
+local Settings = {Enabled=true,ESPEnabled=true,TeamCheck=true,HitPart="Head",FOV=200,ShowFOV=true}
+
+AimTab:Toggle({Title="Enable Aimbot",Default=true,Callback=function(v)Settings.Enabled=v PlayClick()end})
+AimTab:Toggle({Title="Enable ESP",Default=true,Callback=function(v)Settings.ESPEnabled=v PlayClick()end})
+AimTab:Toggle({Title="Show FOV Circle",Default=true,Callback=function(v)Settings.ShowFOV=v PlayClick()end})
+
 AimTab:Slider({
     Title="FOV",
     Step=1,
@@ -96,63 +100,64 @@ AimTab:Slider({
         PlayClick()
     end
 })
-        
-AimTab:Section({Title="Shifters"})        
-AimTab:Paragraph({Title="Shifter System",Desc="",Thumbnail=ShifterImage})        
-        
-local TitanSection = AimTab:Group({}):Section({Title="Titans",Box=true,BoxBorder=true,Opened=true})        
-        
-local SelectedTitan=nil        
-TitanSection:Dropdown({        
-    Title="Select Titan",        
-    Values={"Warhammer","Colossal","Beast","Attack","Female","Jaw","Armored"},        
+
+AimTab:Section({Title="Shifters"})
+AimTab:Paragraph({Title="Shifter System",Desc="",Thumbnail=ShifterImage})
+
+local TitanSection = AimTab:Group({}):Section({Title="Titans",Box=true,BoxBorder=true,Opened=true})
+
+local SelectedTitan=nil
+TitanSection:Dropdown({
+    Title="Select Titan",
+    Values={"Warhammer","Colossal","Beast","Attack","Female","Jaw","Armored"},
     Callback=function(v)
         SelectedTitan=v 
         PlayClick()
-    end        
-})        
-        
-TitanSection:Button({        
-    Title="Shift",        
-    Callback=function()        
-        if not SelectedTitan then return end        
-        PlayClick()        
-        game:GetService("ReplicatedStorage").Remotes.Titans.Transform:FireServer(SelectedTitan)        
-    end        
-})        
-        
---------------------------------------------------        
--- ANTI TITANS        
---------------------------------------------------        
-local AntiTab = Window:Tab({Title="Anti Titan 🔥",Icon="shield"})        
-        
-AntiTab:Paragraph({Title="Anti Titan",Desc="",Thumbnail=AntiImage})        
-        
-local AntiGroup = AntiTab:Group({})        
-        
-local ShifterSection = AntiGroup:Section({        
-    Title="Anti Titan Shifter",        
-    Box=true,        
-    BoxBorder=true,        
-    Opened=true        
-})        
-        
-local KillAura=false        
-local DamageBoost=false        
-local ShifterESP=false        
-local Tracers=false        
-local ThunderFarm=false        
-        
+    end
+})
+
+TitanSection:Button({
+    Title="Shift",
+    Callback=function()
+        if not SelectedTitan then return end
+        PlayClick()
+        game:GetService("ReplicatedStorage").Remotes.Titans.Transform:FireServer(SelectedTitan)
+    end
+})
+
+--------------------------------------------------
+-- ELDIAN TAB
+--------------------------------------------------
+local AntiTab = Window:Tab({Title="Eldian",Icon=EldianIcon})
+
+AntiTab:Paragraph({Title="Eldian",Desc="",Thumbnail=AntiImage})
+
+local AntiGroup = AntiTab:Group({})
+
+local ShifterSection = AntiGroup:Section({
+    Title="Anti Titan Shifter",
+    Box=true,
+    BoxBorder=true,
+    Opened=true
+})
+
+local KillAura=false
+local DamageBoost=false
+local ShifterESP=false
+local Tracers=false
+local ThunderFarm=false
+local PlayerKillAura=false
+
 local TweenSpeed = 0.6
 local AutoFarmPlayers=false
 local FarmMode="Both"
-local PureAura=false
-        
-ShifterSection:Toggle({Title="Titan Shifter Kill Aura",Callback=function(v)KillAura=v PlayClick()end})        
-ShifterSection:Toggle({Title="Damage Boost",Callback=function(v)DamageBoost=v PlayClick()end})        
-ShifterSection:Toggle({Title="Shifter ESP",Callback=function(v)ShifterESP=v PlayClick()end})        
-ShifterSection:Toggle({Title="Tracers",Callback=function(v)Tracers=v PlayClick()end})        
-ShifterSection:Toggle({Title="Thunderspear Auto Farm",Callback=function(v)ThunderFarm=v PlayClick()end})        
+
+ShifterSection:Toggle({Title="Titan Shifter Kill Aura",Callback=function(v)KillAura=v PlayClick()end})
+ShifterSection:Toggle({Title="Damage Boost",Callback=function(v)DamageBoost=v PlayClick()end})
+ShifterSection:Toggle({Title="Shifter ESP",Callback=function(v)ShifterESP=v PlayClick()end})
+ShifterSection:Toggle({Title="Tracers",Callback=function(v)Tracers=v PlayClick()end})
+ShifterSection:Toggle({Title="Thunderspear Auto Farm",Callback=function(v)ThunderFarm=v PlayClick()end})
+ShifterSection:Toggle({Title="Player Kill Aura",Callback=function(v)PlayerKillAura=v PlayClick()end})
 
 ShifterSection:Slider({
     Title="Tween Speed",
@@ -209,14 +214,6 @@ PlayerSection:Dropdown({
     end
 })
 
-PlayerSection:Toggle({
-    Title="Pure Titan Kill Aura",
-    Callback=function(v)
-        PureAura=v
-        PlayClick()
-    end
-})
-
 --------------------------------------------------
 -- 🔥 BACKEND SYSTEMS + LOOPS
 --------------------------------------------------
@@ -252,24 +249,6 @@ local LastThrow=0
 RunService.RenderStepped:Connect(function()
     local myChar=LocalPlayer.Character
     local myRoot=myChar and myChar:FindFirstChild("HumanoidRootPart")
-
-    --------------------------------------------------
-    -- PURE TITAN KILL AURA
-    --------------------------------------------------
-    if PureAura and myRoot then
-        local pureFolder = workspace:FindFirstChild("Objects")
-            and workspace.Objects:FindFirstChild("Titans")
-            and workspace.Objects.Titans:FindFirstChild("Pure")
-
-        if pureFolder then
-            for _, titan in pairs(pureFolder:GetChildren()) do
-                local nape = titan:FindFirstChild("Nape")
-                if nape and (nape.Position - myRoot.Position).Magnitude <= 150 then
-                    ReplicatedStorage.Remotes.Blades.Hit:FireServer(nape,999)
-                end
-            end
-        end
-    end
 
     for _,plr in ipairs(Players:GetPlayers()) do
         if plr==LocalPlayer then continue end
@@ -344,6 +323,15 @@ RunService.RenderStepped:Connect(function()
         end
 
         --------------------------------------------------
+        -- PLAYER KILL AURA
+        --------------------------------------------------
+        if PlayerKillAura and myRoot and char and hitbox then
+            if (hitbox.Position - myRoot.Position).Magnitude <= 150 then
+                ReplicatedStorage.Remotes.Blades.Hit:FireServer(hitbox,999)
+            end
+        end
+
+        --------------------------------------------------
         -- PLAYER AUTOFARM (TOOLS ONLY)
         --------------------------------------------------
         if AutoFarmPlayers and myRoot and char and hitbox and HasTool(plr) then
@@ -397,136 +385,136 @@ task.spawn(function()
 end)
 
 --------------------------------------------------
--- AIMBOT + ESP (UNCHANGED)
+-- AIMBOT + ESP
 --------------------------------------------------
-local function GetCursor()        
-    return UserInputService.TouchEnabled and (Camera.ViewportSize/2) or UserInputService:GetMouseLocation()        
-end        
-        
-local function IsEnemy(plr)        
-    if plr==LocalPlayer then return false end        
-    if Settings.TeamCheck and plr.Team==LocalPlayer.Team then return false end        
-    return true        
-end        
-        
-local function GetNearest()        
-    local closest,distMin=nil,math.huge        
-    local myRoot=LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")        
-    if not myRoot then return nil end        
-        
-    for _,plr in ipairs(Players:GetPlayers()) do        
-        if not IsEnemy(plr) then continue end        
-        local char=plr.Character        
-        if not char then continue end        
-        
-        local part=char:FindFirstChild(Settings.HitPart)        
-        local hum=char:FindFirstChildOfClass("Humanoid")        
-        local root=char:FindFirstChild("HumanoidRootPart")        
-        
-        if not part or not hum or hum.Health<=0 or not root then continue end        
-        
-        local dist=(root.Position-myRoot.Position).Magnitude        
-        if dist<distMin then        
-            distMin=dist        
-            closest=part        
-        end        
-    end        
-        
-    return closest        
-end        
-        
-local LockedTarget=nil        
-        
-local circle=Drawing.new("Circle")        
-circle.Thickness=1        
-circle.Filled=false        
-        
-local ESP={}        
-        
-local function CreateESP(plr)        
-    local box=Drawing.new("Square")        
-    box.Color=Color3.fromRGB(255,0,0)        
-    box.Thickness=2        
-    box.Filled=false        
-    box.Visible=false        
-    ESP[plr]=box        
-end        
-        
-for _,plr in ipairs(Players:GetPlayers()) do        
-    if plr~=LocalPlayer then CreateESP(plr) end        
-end        
-        
-Players.PlayerAdded:Connect(function(plr)        
-    if plr~=LocalPlayer then CreateESP(plr) end        
-end)        
-        
-Players.PlayerRemoving:Connect(function(plr)        
-    if ESP[plr] then ESP[plr]:Remove() ESP[plr]=nil end        
-end)        
-        
-task.defer(function()        
-    Settings.Enabled=false        
-    Settings.ESPEnabled=false        
-    Settings.ShowFOV=false        
-end)        
-        
-RunService.RenderStepped:Connect(function()        
-    if Settings.ShowFOV then        
-        circle.Visible=true        
-        circle.Position=GetCursor()        
-        circle.Radius=Settings.FOV        
-    else        
-        circle.Visible=false        
-    end        
-        
-    if Settings.Enabled then        
-        local target=GetNearest()        
-        LockedTarget=target        
-        if target then        
-            Camera.CFrame=CFrame.new(Camera.CFrame.Position,target.Position)        
-        end        
-    else        
-        LockedTarget=nil        
-    end        
-        
-    for plr,box in pairs(ESP) do        
-        if not Settings.ESPEnabled or not IsEnemy(plr) then        
-            box.Visible=false        
-            continue        
-        end        
-        
-        local char=plr.Character        
-        local hrp=char and char:FindFirstChild("HumanoidRootPart")        
-        local hum=char and char:FindFirstChildOfClass("Humanoid")        
-        
-        if not hrp or not hum or hum.Health<=0 then        
-            box.Visible=false        
-            continue        
-        end        
-        
-        local pos,visible=Camera:WorldToViewportPoint(hrp.Position)        
-        if visible then        
-            local size=3000/pos.Z        
-            box.Size=Vector2.new(size,size*1.5)        
-            box.Position=Vector2.new(pos.X-size/2,pos.Y-size/1.5)        
-            box.Visible=true        
-        else        
-            box.Visible=false        
-        end        
-    end        
-end)        
-        
-local oldIndex        
-oldIndex=hookmetamethod(game,"__index",newcclosure(function(self,key)        
-    if not checkcaller() and Settings.Enabled and self==Mouse then        
-        local target=LockedTarget or GetNearest()        
-        if target then        
-            if key=="Target" then return target        
-            elseif key=="Hit" then return target.CFrame        
-            elseif key=="UnitRay" then        
-                return Ray.new(Camera.CFrame.Position,(target.Position-Camera.CFrame.Position).Unit)        
-            end        
-        end        
-    end        
-    return oldIndex(self,key)        
+local function GetCursor()
+    return UserInputService.TouchEnabled and (Camera.ViewportSize/2) or UserInputService:GetMouseLocation()
+end
+
+local function IsEnemy(plr)
+    if plr==LocalPlayer then return false end
+    if Settings.TeamCheck and plr.Team==LocalPlayer.Team then return false end
+    return true
+end
+
+local function GetNearest()
+    local closest,distMin=nil,math.huge
+    local myRoot=LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if not myRoot then return nil end
+
+    for _,plr in ipairs(Players:GetPlayers()) do
+        if not IsEnemy(plr) then continue end
+        local char=plr.Character
+        if not char then continue end
+
+        local part=char:FindFirstChild(Settings.HitPart)
+        local hum=char:FindFirstChildOfClass("Humanoid")
+        local root=char:FindFirstChild("HumanoidRootPart")
+
+        if not part or not hum or hum.Health<=0 or not root then continue end
+
+        local dist=(root.Position-myRoot.Position).Magnitude
+        if dist<distMin then
+            distMin=dist
+            closest=part
+        end
+    end
+
+    return closest
+end
+
+local LockedTarget=nil
+
+local circle=Drawing.new("Circle")
+circle.Thickness=1
+circle.Filled=false
+
+local ESP={}
+
+local function CreateESP(plr)
+    local box=Drawing.new("Square")
+    box.Color=Color3.fromRGB(255,0,0)
+    box.Thickness=2
+    box.Filled=false
+    box.Visible=false
+    ESP[plr]=box
+end
+
+for _,plr in ipairs(Players:GetPlayers()) do
+    if plr~=LocalPlayer then CreateESP(plr) end
+end
+
+Players.PlayerAdded:Connect(function(plr)
+    if plr~=LocalPlayer then CreateESP(plr) end
+end)
+
+Players.PlayerRemoving:Connect(function(plr)
+    if ESP[plr] then ESP[plr]:Remove() ESP[plr]=nil end
+end)
+
+task.defer(function()
+    Settings.Enabled=false
+    Settings.ESPEnabled=false
+    Settings.ShowFOV=false
+end)
+
+RunService.RenderStepped:Connect(function()
+    if Settings.ShowFOV then
+        circle.Visible=true
+        circle.Position=GetCursor()
+        circle.Radius=Settings.FOV
+    else
+        circle.Visible=false
+    end
+
+    if Settings.Enabled then
+        local target=GetNearest()
+        LockedTarget=target
+        if target then
+            Camera.CFrame=CFrame.new(Camera.CFrame.Position,target.Position)
+        end
+    else
+        LockedTarget=nil
+    end
+
+    for plr,box in pairs(ESP) do
+        if not Settings.ESPEnabled or not IsEnemy(plr) then
+            box.Visible=false
+            continue
+        end
+
+        local char=plr.Character
+        local hrp=char and char:FindFirstChild("HumanoidRootPart")
+        local hum=char and char:FindFirstChildOfClass("Humanoid")
+
+        if not hrp or not hum or hum.Health<=0 then
+            box.Visible=false
+            continue
+        end
+
+        local pos,visible=Camera:WorldToViewportPoint(hrp.Position)
+        if visible then
+            local size=3000/pos.Z
+            box.Size=Vector2.new(size,size*1.5)
+            box.Position=Vector2.new(pos.X-size/2,pos.Y-size/1.5)
+            box.Visible=true
+        else
+            box.Visible=false
+        end
+    end
+end)
+
+local oldIndex
+oldIndex=hookmetamethod(game,"__index",newcclosure(function(self,key)
+    if not checkcaller() and Settings.Enabled and self==Mouse then
+        local target=LockedTarget or GetNearest()
+        if target then
+            if key=="Target" then return target
+            elseif key=="Hit" then return target.CFrame
+            elseif key=="UnitRay" then
+                return Ray.new(Camera.CFrame.Position,(target.Position-Camera.CFrame.Position).Unit)
+            end
+        end
+    end
+    return oldIndex(self,key)
 end))
