@@ -84,7 +84,7 @@ pcall(function()
 end)      
       
 --------------------------------------------------      
--- MARLEYAN TAB (RENAMED)      
+-- MARLEYAN TAB      
 --------------------------------------------------      
 local AimTab = Window:Tab({Title = "Marleyan", Icon = MainIcon})        
 
@@ -202,7 +202,7 @@ PlayerSection:Dropdown({
 })      
 
 --------------------------------------------------      
--- MISC TAB (NEW)      
+-- MISC TAB      
 --------------------------------------------------      
 local MiscTab = Window:Tab({Title="Misc",Icon=MiscIcon})
 
@@ -215,9 +215,66 @@ MiscTab:Paragraph({
 
 local MiscGroup = MiscTab:Group({})
 
---------------------------------------------------
--- SUPPLIES SECTION
---------------------------------------------------
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+local MiscGui = Instance.new("ScreenGui")
+MiscGui.Name = "MiscButtons"
+MiscGui.ResetOnSpawn = false
+MiscGui.Parent = PlayerGui
+
+local MedkitButton
+local AmmoButton
+
+local function MakeDraggable(btn)
+    local dragging, dragInput, startPos, startInputPos
+
+    btn.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            startInputPos = input.Position
+            startPos = btn.Position
+
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    btn.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            local delta = input.Position - startInputPos
+            btn.Position = UDim2.new(
+                startPos.X.Scale,
+                startPos.X.Offset + delta.X,
+                startPos.Y.Scale,
+                startPos.Y.Offset + delta.Y
+            )
+        end
+    end)
+end
+
+local function CreateButton(name, image)
+    local btn = Instance.new("ImageButton")
+    btn.Name = name
+    btn.Size = UDim2.fromOffset(60,60)
+    btn.Position = UDim2.fromOffset(200,200)
+    btn.BackgroundTransparency = 1
+    btn.Image = image
+    btn.Parent = MiscGui
+
+    MakeDraggable(btn)
+
+    return btn
+end
+
 local SupplySection = MiscGroup:Section({
     Title="Supplys",
     Box=true,
@@ -225,48 +282,17 @@ local SupplySection = MiscGroup:Section({
     Opened=true
 })
 
-local MedkitButton
-local AmmoButton
-
-local function MakeDraggable(btn)
-    local dragging, dragInput, start, startPos
-
-    btn.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = true
-            start = input.Position
-            startPos = btn.Position
-        end
-    end)
-
-    btn.InputChanged:Connect(function(input)
-        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-            local delta = input.Position - start
-            btn.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-        end
-    end)
-
-    btn.InputEnded:Connect(function()
-        dragging = false
-    end)
-end
-
 SupplySection:Toggle({
     Title="Medkit Button",
     Callback=function(v)
         PlayClick()
         if v then
-            MedkitButton = Instance.new("ImageButton")
-            MedkitButton.Size = UDim2.fromOffset(60,60)
-            MedkitButton.Position = UDim2.new(0.8,0,0.7,0)
-            MedkitButton.Image = MedkitImg
-            MedkitButton.Parent = game.CoreGui
-
-            MakeDraggable(MedkitButton)
-
-            MedkitButton.MouseButton1Click:Connect(function()
-                ReplicatedStorage.Remotes.General.BuySupply:InvokeServer("Medkit")
-            end)
+            if not MedkitButton then
+                MedkitButton = CreateButton("MedkitButton", MedkitImg)
+                MedkitButton.MouseButton1Click:Connect(function()
+                    ReplicatedStorage.Remotes.General.BuySupply:InvokeServer("Medkit")
+                end)
+            end
         else
             if MedkitButton then MedkitButton:Destroy() MedkitButton=nil end
         end
@@ -278,26 +304,18 @@ SupplySection:Toggle({
     Callback=function(v)
         PlayClick()
         if v then
-            AmmoButton = Instance.new("ImageButton")
-            AmmoButton.Size = UDim2.fromOffset(60,60)
-            AmmoButton.Position = UDim2.new(0.7,0,0.7,0)
-            AmmoButton.Image = AmmoImg
-            AmmoButton.Parent = game.CoreGui
-
-            MakeDraggable(AmmoButton)
-
-            AmmoButton.MouseButton1Click:Connect(function()
-                ReplicatedStorage.Remotes.General.BuySupply:InvokeServer("Refill Kit")
-            end)
+            if not AmmoButton then
+                AmmoButton = CreateButton("AmmoButton", AmmoImg)
+                AmmoButton.MouseButton1Click:Connect(function()
+                    ReplicatedStorage.Remotes.General.BuySupply:InvokeServer("Refill Kit")
+                end)
+            end
         else
             if AmmoButton then AmmoButton:Destroy() AmmoButton=nil end
         end
     end
 })
 
---------------------------------------------------
--- AMMO SECTION MOVED HERE
---------------------------------------------------
 local AmmoSection = MiscGroup:Section({
     Title="Ammo",
     Box=true,
@@ -306,14 +324,11 @@ local AmmoSection = MiscGroup:Section({
 })
 
 local InfSpear=false
-
 AmmoSection:Toggle({Title="Infinite Thunderspear",Callback=function(v)InfSpear=v PlayClick()end})
 
 --------------------------------------------------
 -- 🔥 BACKEND SYSTEMS + LOOPS
 --------------------------------------------------
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local function GetNape(plr)
     local obj=workspace:FindFirstChild("Objects")
@@ -448,6 +463,19 @@ RunService.RenderStepped:Connect(function()
 
                 ReplicatedStorage.Remotes.Blades.Hit:FireServer(nape,999)
             end
+        end
+    end
+end)
+
+--------------------------------------------------
+-- 🔥 INFINITE AMMO (ONLY SPEAR LEFT)
+--------------------------------------------------
+task.spawn(function()
+    while true do
+        task.wait(0.3)
+
+        if InfSpear then
+            ReplicatedStorage.Remotes.Thunderspear.Refill:FireServer()
         end
     end
 end)
