@@ -1,17 +1,17 @@
 -- WINDUI    
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()    
-  
+
 -- SERVICES    
 local Players = game:GetService("Players")    
 local RunService = game:GetService("RunService")    
 local UserInputService = game:GetService("UserInputService")    
 local SoundService = game:GetService("SoundService")    
 local TweenService = game:GetService("TweenService")  
-  
+
 local LocalPlayer = Players.LocalPlayer    
 local Camera = workspace.CurrentCamera    
 local Mouse = LocalPlayer:GetMouse()    
-  
+
 -- SOUND  
 local ClickSoundId = nil  
 pcall(function()  
@@ -24,7 +24,7 @@ pcall(function()
         ClickSoundId = getasset("click.mp3")  
     end  
 end)  
-  
+
 local function PlayClick()  
     if not ClickSoundId then return end  
     local s = Instance.new("Sound")  
@@ -34,7 +34,7 @@ local function PlayClick()
     s:Play()  
     s.Ended:Connect(function() s:Destroy() end)  
 end  
-  
+
 -- IMAGES  
 local function loadImage(name, url)  
     local asset = "rbxthumb://type=Asset&id=0&w=420&h=420"  
@@ -49,16 +49,17 @@ local function loadImage(name, url)
     end)  
     return asset  
 end  
-  
+
 local WindowIcon = loadImage("win.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/6a50cad53db0ecdea5fcc47343f415fe.png")  
 local MainIcon = loadImage("main.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/warrior-unit-marley-attack-on-titan.png")  
 local EldianIcon = loadImage("eldian.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/images%20(19)%20(1).png")  
-  
+local MiscIcon = loadImage("misc.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/4hxn62u3ohzb1.png")  
+
 local ShifterImage = loadImage("shifter.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/images__18_-removebg-preview.png")  
 local TitanImage   = loadImage("titan.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/noFilter.png")  
 local AntiImage    = loadImage("anti.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/attackontitaneating.png")  
 local BackgroundAsset = loadImage("bg.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/3_20260325_141743_0002.png")  
-  
+
 -- WINDOW    
 local Window = WindUI:CreateWindow({    
     Title = "Aimbot GUI",    
@@ -71,26 +72,26 @@ local Window = WindUI:CreateWindow({
     Background = BackgroundAsset,  
     BackgroundImageTransparency = 0.5  
 })    
-  
+
 pcall(function()  
     Window:OnTabChanged(function()  
         PlayClick()  
     end)  
 end)  
-  
+
 --------------------------------------------------  
--- MAIN TAB  
+-- MARLEYAN TAB (RENAMED)
 --------------------------------------------------  
-local AimTab = Window:Tab({Title = "Main", Icon = MainIcon})    
-  
+local AimTab = Window:Tab({Title = "Marleyan", Icon = MainIcon})    
+
 AimTab:Paragraph({Title = "Titan Warfare",Desc = "",Thumbnail = TitanImage})  
-  
+
 local Settings = {Enabled=true,ESPEnabled=true,TeamCheck=true,HitPart="Head",FOV=200,ShowFOV=true}  
-  
+
 AimTab:Toggle({Title="Enable Aimbot",Default=true,Callback=function(v)Settings.Enabled=v PlayClick()end})  
 AimTab:Toggle({Title="Enable ESP",Default=true,Callback=function(v)Settings.ESPEnabled=v PlayClick()end})  
 AimTab:Toggle({Title="Show FOV Circle",Default=true,Callback=function(v)Settings.ShowFOV=v PlayClick()end})  
-  
+
 AimTab:Slider({  
     Title="FOV",  
     Step=1,  
@@ -100,12 +101,12 @@ AimTab:Slider({
         PlayClick()  
     end  
 })  
-  
+
 AimTab:Section({Title="Shifters"})  
 AimTab:Paragraph({Title="Shifter System",Desc="",Thumbnail=ShifterImage})  
-  
+
 local TitanSection = AimTab:Group({}):Section({Title="Titans",Box=true,BoxBorder=true,Opened=true})  
-  
+
 local SelectedTitan=nil  
 TitanSection:Dropdown({  
     Title="Select Titan",  
@@ -115,7 +116,7 @@ TitanSection:Dropdown({
         PlayClick()  
     end  
 })  
-  
+
 TitanSection:Button({  
     Title="Shift",  
     Callback=function()  
@@ -124,122 +125,100 @@ TitanSection:Button({
         game:GetService("ReplicatedStorage").Remotes.Titans.Transform:FireServer(SelectedTitan)  
     end  
 })  
-  
---------------------------------------------------  
--- ELDIAN TAB  
---------------------------------------------------  
-local AntiTab = Window:Tab({Title="Eldian",Icon=EldianIcon})  
-  
-AntiTab:Paragraph({Title="Eldian",Desc="",Thumbnail=AntiImage})  
-  
-local AntiGroup = AntiTab:Group({})  
-  
-local ShifterSection = AntiGroup:Section({  
-    Title="Anti Titan Shifter",  
-    Box=true,  
-    BoxBorder=true,  
-    Opened=true  
-})  
-  
-local KillAura=false  
-local DamageBoost=false  
-local ShifterESP=false  
-local Tracers=false  
-local ThunderFarm=false  
-local PlayerKillAura=false  
-  
-local TweenSpeed = 0.6  
-local AutoFarmPlayers=false  
-local FarmMode="Both"  
-  
-ShifterSection:Toggle({Title="Titan Shifter Kill Aura",Callback=function(v)KillAura=v PlayClick()end})  
-ShifterSection:Toggle({Title="Damage Boost",Callback=function(v)DamageBoost=v PlayClick()end})  
-ShifterSection:Toggle({Title="Shifter ESP",Callback=function(v)ShifterESP=v PlayClick()end})  
-ShifterSection:Toggle({Title="Tracers",Callback=function(v)Tracers=v PlayClick()end})  
-ShifterSection:Toggle({Title="Thunderspear Auto Farm",Callback=function(v)ThunderFarm=v PlayClick()end})  
-ShifterSection:Toggle({Title="Player Kill Aura",Callback=function(v)PlayerKillAura=v PlayClick()end})  
-  
-ShifterSection:Slider({  
-    Title="Tween Speed",  
-    Step=0.1,  
-    Value={Min=0.1,Max=2,Default=0.6},  
-    Callback=function(v)  
-        TweenSpeed=v  
-        PlayClick()  
-    end  
-})  
-  
---------------------------------------------------  
--- AMMO SECTION  
---------------------------------------------------  
-local AmmoSection = AntiGroup:Section({  
-    Title="Ammo",  
-    Box=true,  
-    BoxBorder=true,  
-    Opened=false  
-})  
-  
-local InfBlade=false  
-local InfSpear=false  
-local InfGas=false  
-  
-AmmoSection:Toggle({Title="Infinite Blades",Callback=function(v)InfBlade=v PlayClick()end})  
-AmmoSection:Toggle({Title="Infinite Thunderspear",Callback=function(v)InfSpear=v PlayClick()end})  
-AmmoSection:Toggle({Title="Infinite Gas",Callback=function(v)InfGas=v PlayClick()end})  
-  
---------------------------------------------------  
--- PLAYERS SECTION  
---------------------------------------------------  
-local PlayerSection = AntiGroup:Section({  
-    Title="Players",  
-    Box=true,  
-    BoxBorder=true,  
-    Opened=false  
-})  
-  
-PlayerSection:Toggle({  
-    Title="Auto Farm Players",  
-    Callback=function(v)  
-        AutoFarmPlayers=v  
-        PlayClick()  
-    end  
-})  
-  
-PlayerSection:Dropdown({  
-    Title="Farm Mode",  
-    Values={"Players","Titans","Both"},  
-    Callback=function(v)  
-        FarmMode=v  
-        PlayClick()  
-    end  
-})  
 
---------------------------------------------------
--- 🔥 ESP/TRACER FIX SYSTEM (IMPORTANT)
---------------------------------------------------
+--------------------------------------------------  
+-- MISC TAB (NEW)
+--------------------------------------------------  
+local MiscTab = Window:Tab({Title="Misc",Icon=MiscIcon})
 
-local Boxes,Lines = {},{}
+MiscTab:Paragraph({
+    Title="Experimental",
+    Desc="this tab is for experimental features expect some bugs if there are bugs report it to me on discord",
+    Thumbnail=MiscIcon,
+    Image="https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/new-official-aot-illustration-v0-buix6hq9o9zd1.png"
+})
 
-local function CleanupESP(plr)
-    if Boxes[plr] then
-        Boxes[plr]:Remove()
-        Boxes[plr] = nil
-    end
-    if Lines[plr] then
-        Lines[plr]:Remove()
-        Lines[plr] = nil
-    end
+local MiscGroup = MiscTab:Group({})
+
+local SupplySection = MiscGroup:Section({
+    Title="Supplys",
+    Box=true,
+    BoxBorder=true,
+    Opened=true
+})
+
+local MedkitUI
+local AmmoUI
+
+local function MakeDraggable(btn)
+    local dragging=false
+    local dragInput,startPos,startInput
+
+    btn.InputBegan:Connect(function(input)
+        if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then
+            dragging=true
+            startInput=input.Position
+            startPos=btn.Position
+        end
+    end)
+
+    btn.InputEnded:Connect(function(input)
+        if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then
+            dragging=false
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType==Enum.UserInputType.MouseMovement or input.UserInputType==Enum.UserInputType.Touch) then
+            local delta=input.Position-startInput
+            btn.Position=UDim2.new(startPos.X.Scale,startPos.X.Offset+delta.X,startPos.Y.Scale,startPos.Y.Offset+delta.Y)
+        end
+    end)
 end
 
-Players.PlayerRemoving:Connect(function(plr)
-    CleanupESP(plr)
-end)
+SupplySection:Toggle({
+    Title="Medkit Button",
+    Callback=function(v)
+        PlayClick()
+        if v then
+            MedkitUI = Instance.new("ImageButton")
+            MedkitUI.Size = UDim2.fromOffset(60,60)
+            MedkitUI.Position = UDim2.new(0.5,0,0.5,0)
+            MedkitUI.Image = loadImage("medkit.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/20260328_090408_0001-removebg-preview.png")
+            MedkitUI.Parent = game.CoreGui
 
-Players.PlayerAdded:Connect(function(plr)
-    plr.CharacterAdded:Connect(function()
-        CleanupESP(plr)
-    end)
-end)
+            MakeDraggable(MedkitUI)
+
+            MedkitUI.MouseButton1Click:Connect(function()
+                game:GetService("ReplicatedStorage").Remotes.General.BuySupply:InvokeServer("Medkit")
+            end)
+        else
+            if MedkitUI then MedkitUI:Destroy() MedkitUI=nil end
+        end
+    end
+})
+
+SupplySection:Toggle({
+    Title="Ammo Button",
+    Callback=function(v)
+        PlayClick()
+        if v then
+            AmmoUI = Instance.new("ImageButton")
+            AmmoUI.Size = UDim2.fromOffset(60,60)
+            AmmoUI.Position = UDim2.new(0.6,0,0.5,0)
+            AmmoUI.Image = loadImage("ammo.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/20260328_090740_0001-removebg-preview.png")
+            AmmoUI.Parent = game.CoreGui
+
+            MakeDraggable(AmmoUI)
+
+            AmmoUI.MouseButton1Click:Connect(function()
+                game:GetService("ReplicatedStorage").Remotes.General.BuySupply:InvokeServer("Refill Kit")
+            end)
+        else
+            if AmmoUI then AmmoUI:Destroy() AmmoUI=nil end
+        end
+    end
+})
 
 --------------------------------------------------
 -- 🔥 BACKEND SYSTEMS + LOOPS
@@ -284,9 +263,6 @@ RunService.RenderStepped:Connect(function()
         local char=plr.Character
         local hitbox=char and char:FindFirstChild("PlayerHitbox")
 
-        --------------------------------------------------
-        -- SHIFTER LOGIC
-        --------------------------------------------------
         if nape then
             local pos,vis=Camera:WorldToViewportPoint(nape.Position)
 
@@ -313,9 +289,6 @@ RunService.RenderStepped:Connect(function()
                 end
             end
 
-            --------------------------------------------------
-            -- ✅ FIXED ESP
-            --------------------------------------------------
             if ShifterESP and vis and char and char.Parent and nape.Parent then
                 if not Boxes[plr] then
                     local b=Drawing.new("Square")
@@ -336,9 +309,6 @@ RunService.RenderStepped:Connect(function()
                 end
             end
 
-            --------------------------------------------------
-            -- ✅ FIXED TRACERS
-            --------------------------------------------------
             if Tracers and vis and char and char.Parent then
                 if not Lines[plr] then
                     local l=Drawing.new("Line")
@@ -361,18 +331,12 @@ RunService.RenderStepped:Connect(function()
             if Lines[plr] then Lines[plr].Visible=false end
         end
 
-        --------------------------------------------------
-        -- PLAYER KILL AURA
-        --------------------------------------------------
         if PlayerKillAura and myRoot and char and hitbox then
             if (hitbox.Position - myRoot.Position).Magnitude <= 150 then
                 ReplicatedStorage.Remotes.Blades.Hit:FireServer(hitbox,999)
             end
         end
 
-        --------------------------------------------------
-        -- PLAYER AUTOFARM (TOOLS ONLY)
-        --------------------------------------------------
         if AutoFarmPlayers and myRoot and char and hitbox and HasTool(plr) then
             if FarmMode=="Players" or FarmMode=="Both" then
                 TweenService:Create(
@@ -385,9 +349,6 @@ RunService.RenderStepped:Connect(function()
             end
         end
 
-        --------------------------------------------------
-        -- TITAN AUTOFARM
-        --------------------------------------------------
         if AutoFarmPlayers and nape then
             if FarmMode=="Titans" or FarmMode=="Both" then
                 TweenService:Create(
@@ -403,28 +364,20 @@ RunService.RenderStepped:Connect(function()
 end)
 
 --------------------------------------------------
--- 🔥 INFINITE AMMO
+-- 🔥 INFINITE AMMO (ONLY SPEAR LEFT)
 --------------------------------------------------
 task.spawn(function()
     while true do
         task.wait(0.3)
 
-        if InfBlade then
-            ReplicatedStorage.Remotes.Blades.Refill:FireServer()
-        end
-
         if InfSpear then
             ReplicatedStorage.Remotes.Thunderspear.Refill:FireServer()
-        end
-
-        if InfGas then
-            ReplicatedStorage.Remotes.ODM.Refill:FireServer()
         end
     end
 end)
 
 --------------------------------------------------
--- AIMBOT + ESP (UNCHANGED)
+-- AIMBOT + ESP
 --------------------------------------------------
 local function GetCursor()
     return UserInputService.TouchEnabled and (Camera.ViewportSize/2) or UserInputService:GetMouseLocation()
