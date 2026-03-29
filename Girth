@@ -8,10 +8,15 @@ local UserInputService = game:GetService("UserInputService")
 local SoundService = game:GetService("SoundService")        
 local TweenService = game:GetService("TweenService")      
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-      
+
 local LocalPlayer = Players.LocalPlayer        
 local Camera = workspace.CurrentCamera        
 local Mouse = LocalPlayer:GetMouse()        
+
+-- 🔥 TEAM CHECK FIX (IMPORTANT)
+local function IsEldian()
+    return LocalPlayer.Team and string.find(string.lower(LocalPlayer.Team.Name), "eldian")
+end
       
 -- SOUND      
 local ClickSoundId = nil      
@@ -35,7 +40,7 @@ local function PlayClick()
     s:Play()      
     s.Ended:Connect(function() s:Destroy() end)      
 end      
-      
+
 -- IMAGES      
 local function loadImage(name, url)      
     local asset = "rbxthumb://type=Asset&id=0&w=420&h=420"      
@@ -50,7 +55,7 @@ local function loadImage(name, url)
     end)      
     return asset      
 end      
-      
+
 local WindowIcon = loadImage("win.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/6a50cad53db0ecdea5fcc47343f415fe.png")      
 local MainIcon = loadImage("main.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/warrior-unit-marley-attack-on-titan.png")      
 local EldianIcon = loadImage("eldian.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/images%20(19)%20(1).png")      
@@ -63,7 +68,7 @@ local ShifterImage = loadImage("shifter.png","https://raw.githubusercontent.com/
 local TitanImage   = loadImage("titan.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/noFilter.png")      
 local AntiImage    = loadImage("anti.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/attackontitaneating.png")      
 local BackgroundAsset = loadImage("bg.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/3_20260325_141743_0002.png")      
-      
+
 -- WINDOW        
 local Window = WindUI:CreateWindow({        
     Title = "Aimbot GUI",        
@@ -76,13 +81,13 @@ local Window = WindUI:CreateWindow({
     Background = BackgroundAsset,      
     BackgroundImageTransparency = 0.5      
 })        
-      
+
 pcall(function()      
     Window:OnTabChanged(function()      
         PlayClick()      
     end)      
 end)      
-      
+
 --------------------------------------------------      
 -- MARLEYAN TAB      
 --------------------------------------------------      
@@ -131,7 +136,7 @@ TitanSection:Button({
 })      
 
 --------------------------------------------------      
--- ELDIAN TAB      
+-- ELDIAN TAB (FIXED LOGIC)      
 --------------------------------------------------      
 local AntiTab = Window:Tab({Title="Eldian",Icon=EldianIcon})      
 
@@ -175,33 +180,6 @@ ShifterSection:Slider({
 })      
 
 --------------------------------------------------      
--- PLAYERS SECTION      
---------------------------------------------------      
-local PlayerSection = AntiGroup:Section({      
-    Title="Players",      
-    Box=true,      
-    BoxBorder=true,      
-    Opened=false      
-})      
-
-PlayerSection:Toggle({      
-    Title="Auto Farm Players",      
-    Callback=function(v)      
-        AutoFarmPlayers=v      
-        PlayClick()      
-    end      
-})      
-
-PlayerSection:Dropdown({      
-    Title="Farm Mode",      
-    Values={"Players","Titans","Both"},      
-    Callback=function(v)      
-        FarmMode=v      
-        PlayClick()      
-    end      
-})      
-
---------------------------------------------------      
 -- MISC TAB      
 --------------------------------------------------      
 local MiscTab = Window:Tab({Title="Misc",Icon=MiscIcon})
@@ -215,116 +193,54 @@ MiscTab:Paragraph({
 
 local MiscGroup = MiscTab:Group({})
 
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+--------------------------------------------------
+-- OP GROUP (NEW)
+--------------------------------------------------
+local OpGroup = MiscTab:Group({})
 
-local MiscGui = Instance.new("ScreenGui")
-MiscGui.Name = "MiscButtons"
-MiscGui.ResetOnSpawn = false
-MiscGui.Parent = PlayerGui
-
-local MedkitButton
-local AmmoButton
-
-local function MakeDraggable(btn)
-    local dragging, dragInput, startPos, startInputPos
-
-    btn.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = true
-            startInputPos = input.Position
-            startPos = btn.Position
-
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                end
-            end)
-        end
-    end)
-
-    btn.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-            dragInput = input
-        end
-    end)
-
-    UserInputService.InputChanged:Connect(function(input)
-        if input == dragInput and dragging then
-            local delta = input.Position - startInputPos
-            btn.Position = UDim2.new(
-                startPos.X.Scale,
-                startPos.X.Offset + delta.X,
-                startPos.Y.Scale,
-                startPos.Y.Offset + delta.Y
-            )
-        end
-    end)
-end
-
-local function CreateButton(name, image)
-    local btn = Instance.new("ImageButton")
-    btn.Name = name
-    btn.Size = UDim2.fromOffset(60,60)
-    btn.Position = UDim2.fromOffset(200,200)
-    btn.BackgroundTransparency = 1
-    btn.Image = image
-    btn.Parent = MiscGui
-
-    MakeDraggable(btn)
-
-    return btn
-end
-
-local SupplySection = MiscGroup:Section({
-    Title="Supplys",
+local HealthSection = OpGroup:Section({
+    Title="Health",
     Box=true,
     BoxBorder=true,
     Opened=true
 })
 
-SupplySection:Toggle({
-    Title="Medkit Button",
+local SemiGod=false
+
+HealthSection:Toggle({
+    Title="Semi-GodMode",
     Callback=function(v)
+        SemiGod=v
         PlayClick()
-        if v then
-            if not MedkitButton then
-                MedkitButton = CreateButton("MedkitButton", MedkitImg)
-                MedkitButton.MouseButton1Click:Connect(function()
-                    ReplicatedStorage.Remotes.General.BuySupply:InvokeServer("Medkit")
-                end)
-            end
-        else
-            if MedkitButton then MedkitButton:Destroy() MedkitButton=nil end
-        end
     end
 })
 
-SupplySection:Toggle({
-    Title="Ammo Button",
-    Callback=function(v)
-        PlayClick()
-        if v then
-            if not AmmoButton then
-                AmmoButton = CreateButton("AmmoButton", AmmoImg)
-                AmmoButton.MouseButton1Click:Connect(function()
-                    ReplicatedStorage.Remotes.General.BuySupply:InvokeServer("Refill Kit")
-                end)
+-- 🔥 SEMI GODMODE LOOP
+task.spawn(function()
+    while true do
+        task.wait(0.2)
+
+        if SemiGod then
+            local char = LocalPlayer.Character
+            local hum = char and char:FindFirstChildOfClass("Humanoid")
+
+            if hum and hum.Health > 0 then
+                if hum.Health <= (hum.MaxHealth * 0.7) then
+                    pcall(function()
+                        ReplicatedStorage.Remotes.General.BuySupply:InvokeServer("Medkit")
+                    end)
+
+                    -- fallback: try using tool
+                    for _,v in pairs(char:GetChildren()) do
+                        if v:IsA("Tool") and string.find(v.Name:lower(),"med") then
+                            v:Activate()
+                        end
+                    end
+                end
             end
-        else
-            if AmmoButton then AmmoButton:Destroy() AmmoButton=nil end
         end
     end
-})
-
-local AmmoSection = MiscGroup:Section({
-    Title="Ammo",
-    Box=true,
-    BoxBorder=true,
-    Opened=false
-})
-
-local InfSpear=false
-AmmoSection:Toggle({Title="Infinite Thunderspear",Callback=function(v)InfSpear=v PlayClick()end})
+end)
 
 --------------------------------------------------
 -- 🔥 BACKEND SYSTEMS + LOOPS
@@ -367,14 +283,19 @@ RunService.RenderStepped:Connect(function()
         local char=plr.Character
         local hitbox=char and char:FindFirstChild("PlayerHitbox")
 
+        --------------------------------------------------
+        -- 🔥 SHIFTER LOGIC (ELDIAN LOCK)
+        --------------------------------------------------
         if nape then
             local pos,vis=Camera:WorldToViewportPoint(nape.Position)
 
-            if KillAura and myRoot and (nape.Position-myRoot.Position).Magnitude<=200 then
+            -- ✅ Kill Aura ONLY if Eldian
+            if KillAura and IsEldian() and myRoot and (nape.Position-myRoot.Position).Magnitude<=200 then
                 ReplicatedStorage.Remotes.Blades.Hit:FireServer(nape,DamageBoost and 999 or 686)
             end
 
-            if ThunderFarm and myRoot then
+            -- ✅ ThunderFarm ONLY if Eldian
+            if ThunderFarm and IsEldian() and myRoot then
                 local targetPos = nape.Position - (nape.CFrame.LookVector * 80)
 
                 TweenService:Create(
@@ -393,7 +314,11 @@ RunService.RenderStepped:Connect(function()
                 end
             end
 
+            --------------------------------------------------
+            -- ESP
+            --------------------------------------------------
             if ShifterESP and vis and char and char.Parent and nape.Parent then
+                if not Boxes then Boxes={} end
                 if not Boxes[plr] then
                     local b=Drawing.new("Square")
                     b.Color=Color3.fromRGB(170,0,255)
@@ -408,12 +333,16 @@ RunService.RenderStepped:Connect(function()
                 b.Position=Vector2.new(pos.X-size/2,pos.Y-size/1.5)
                 b.Visible=true
             else
-                if Boxes[plr] then
+                if Boxes and Boxes[plr] then
                     Boxes[plr].Visible=false
                 end
             end
 
+            --------------------------------------------------
+            -- TRACERS
+            --------------------------------------------------
             if Tracers and vis and char and char.Parent then
+                if not Lines then Lines={} end
                 if not Lines[plr] then
                     local l=Drawing.new("Line")
                     l.Color=Color3.fromRGB(170,0,255)
@@ -426,22 +355,28 @@ RunService.RenderStepped:Connect(function()
                 l.To=Vector2.new(pos.X,pos.Y)
                 l.Visible=true
             else
-                if Lines[plr] then
+                if Lines and Lines[plr] then
                     Lines[plr].Visible=false
                 end
             end
         else
-            if Boxes[plr] then Boxes[plr].Visible=false end
-            if Lines[plr] then Lines[plr].Visible=false end
+            if Boxes and Boxes[plr] then Boxes[plr].Visible=false end
+            if Lines and Lines[plr] then Lines[plr].Visible=false end
         end
 
-        if PlayerKillAura and myRoot and char and hitbox then
+        --------------------------------------------------
+        -- 🔥 PLAYER KILL AURA (ELDIAN LOCK)
+        --------------------------------------------------
+        if PlayerKillAura and IsEldian() and myRoot and char and hitbox then
             if (hitbox.Position - myRoot.Position).Magnitude <= 150 then
                 ReplicatedStorage.Remotes.Blades.Hit:FireServer(hitbox,999)
             end
         end
 
-        if AutoFarmPlayers and myRoot and char and hitbox and HasTool(plr) then
+        --------------------------------------------------
+        -- PLAYER AUTOFARM (ELDIAN LOCK)
+        --------------------------------------------------
+        if AutoFarmPlayers and IsEldian() and myRoot and char and hitbox and HasTool(plr) then
             if FarmMode=="Players" or FarmMode=="Both" then
                 TweenService:Create(
                     myRoot,
@@ -453,7 +388,10 @@ RunService.RenderStepped:Connect(function()
             end
         end
 
-        if AutoFarmPlayers and nape then
+        --------------------------------------------------
+        -- TITAN AUTOFARM (ELDIAN LOCK)
+        --------------------------------------------------
+        if AutoFarmPlayers and IsEldian() and nape then
             if FarmMode=="Titans" or FarmMode=="Both" then
                 TweenService:Create(
                     myRoot,
@@ -468,7 +406,7 @@ RunService.RenderStepped:Connect(function()
 end)
 
 --------------------------------------------------
--- 🔥 INFINITE AMMO (ONLY SPEAR LEFT)
+-- 🔥 INFINITE THUNDERSPEAR ONLY
 --------------------------------------------------
 task.spawn(function()
     while true do
