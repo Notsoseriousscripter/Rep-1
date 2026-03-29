@@ -1,277 +1,254 @@
--- WINDUI            
-local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()            
-          
--- SERVICES            
-local Players = game:GetService("Players")            
-local RunService = game:GetService("RunService")            
-local UserInputService = game:GetService("UserInputService")            
-local SoundService = game:GetService("SoundService")            
-local TweenService = game:GetService("TweenService")          
-local ReplicatedStorage = game:GetService("ReplicatedStorage")    
-          
-local LocalPlayer = Players.LocalPlayer            
-local Camera = workspace.CurrentCamera            
-local Mouse = LocalPlayer:GetMouse()            
-          
--- SOUND          
-local ClickSoundId = nil          
-pcall(function()          
-    local getasset = getsynasset or getcustomasset          
-    if getasset and writefile then          
-        local url = "https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/main/ezgif-1065ef8f7c627c89.mp3"          
-        if not isfile("click.mp3") then          
-            writefile("click.mp3", game:HttpGet(url))          
-        end          
-        ClickSoundId = getasset("click.mp3")          
-    end          
-end)          
-          
-local function PlayClick()          
-    if not ClickSoundId then return end          
-    local s = Instance.new("Sound")          
-    s.SoundId = ClickSoundId          
-    s.Volume = 2          
-    s.Parent = SoundService          
-    s:Play()          
-    s.Ended:Connect(function() s:Destroy() end)          
-end          
-          
--- IMAGES          
-local function loadImage(name, url)          
-    local asset = "rbxthumb://type=Asset&id=0&w=420&h=420"          
-    pcall(function()          
-        local getasset = getsynasset or getcustomasset          
-        if getasset and writefile then          
-            if not isfile(name) then          
-                writefile(name, game:HttpGet(url))          
-            end          
-            asset = getasset(name)          
-        end          
-    end)          
-    return asset          
-end          
-          
-local WindowIcon = loadImage("win.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/6a50cad53db0ecdea5fcc47343f415fe.png")          
-local MainIcon = loadImage("main.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/warrior-unit-marley-attack-on-titan.png")          
-local EldianIcon = loadImage("eldian.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/images%20(19)%20(1).png")          
-local MiscIcon = loadImage("misc.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/4hxn62u3ohzb1.png")    
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 
-local MedkitImg = loadImage("medkit.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/20260328_090408_0001-removebg-preview.png")    
-local AmmoImg = loadImage("ammo.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/20260328_090740_0001-removebg-preview.png")    
-          
-local ShifterImage = loadImage("shifter.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/images__18_-removebg-preview.png")          
-local TitanImage   = loadImage("titan.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/noFilter.png")          
-local AntiImage    = loadImage("anti.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/attackontitaneating.png")          
-local BackgroundAsset = loadImage("bg.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/3_20260325_141743_0002.png")          
-          
--- WINDOW            
-local Window = WindUI:CreateWindow({            
-    Title = "Aimbot GUI",            
-    Icon = WindowIcon,            
-    Author = "by you",            
-    Folder = "AimbotGUI",            
-    Size = UDim2.fromOffset(580,460),            
-    Theme = "Dark",          
-    Transparent = true,          
-    Background = BackgroundAsset,          
-    BackgroundImageTransparency = 0.5          
-})            
-          
-pcall(function()          
-    Window:OnTabChanged(function()          
-        PlayClick()          
-    end)          
-end)          
-          
---------------------------------------------------          
--- MARLEYAN TAB          
---------------------------------------------------          
-local AimTab = Window:Tab({Title = "Marleyan", Icon = MainIcon})            
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local SoundService = game:GetService("SoundService")
+local TweenService = game:GetService("TweenService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-AimTab:Paragraph({Title = "Titan Warfare",Desc = "",Thumbnail = TitanImage})          
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+local Mouse = LocalPlayer:GetMouse()
 
-local Settings = {Enabled=true,ESPEnabled=true,TeamCheck=true,HitPart="Head",FOV=200,ShowFOV=true}          
+local ClickSoundId = nil
+pcall(function()
+    local getasset = getsynasset or getcustomasset
+    if getasset and writefile then
+        local url = "https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/main/ezgif-1065ef8f7c627c89.mp3"
+        if not isfile("click.mp3") then
+            writefile("click.mp3", game:HttpGet(url))
+        end
+        ClickSoundId = getasset("click.mp3")
+    end
+end)
 
-AimTab:Toggle({Title="Enable Aimbot",Default=true,Callback=function(v)Settings.Enabled=v PlayClick()end})          
-AimTab:Toggle({Title="Enable ESP",Default=true,Callback=function(v)Settings.ESPEnabled=v PlayClick()end})          
-AimTab:Toggle({Title="Show FOV Circle",Default=true,Callback=function(v)Settings.ShowFOV=v PlayClick()end})          
+local function PlayClick()
+    if not ClickSoundId then return end
+    local s = Instance.new("Sound")
+    s.SoundId = ClickSoundId
+    s.Volume = 2
+    s.Parent = SoundService
+    s:Play()
+    s.Ended:Connect(function() s:Destroy() end)
+end
 
-AimTab:Slider({          
-    Title="FOV",          
-    Step=1,          
-    Value={Min=0,Max=400,Default=200},          
-    Callback=function(v)          
-        Settings.FOV=v          
-        PlayClick()          
-    end          
-})          
+local function loadImage(name, url)
+    local asset = "rbxthumb://type=Asset&id=0&w=420&h=420"
+    pcall(function()
+        local getasset = getsynasset or getcustomasset
+        if getasset and writefile then
+            if not isfile(name) then
+                writefile(name, game:HttpGet(url))
+            end
+            asset = getasset(name)
+        end
+    end)
+    return asset
+end
 
-AimTab:Section({Title="Shifters"})          
-AimTab:Paragraph({Title="Shifter System",Desc="",Thumbnail=ShifterImage})          
+local WindowIcon = loadImage("win.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/6a50cad53db0ecdea5fcc47343f415fe.png")
+local MainIcon = loadImage("main.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/warrior-unit-marley-attack-on-titan.png")
+local EldianIcon = loadImage("eldian.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/images%20(19)%20(1).png")
+local MiscIcon = loadImage("misc.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/4hxn62u3ohzb1.png")
 
-local TitanSection = AimTab:Group({}):Section({Title="Titans",Box=true,BoxBorder=true,Opened=true})          
+local MedkitImg = loadImage("medkit.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/20260328_090408_0001-removebg-preview.png")
+local AmmoImg = loadImage("ammo.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/20260328_090740_0001-removebg-preview.png")
 
-local SelectedTitan=nil          
-TitanSection:Dropdown({          
-    Title="Select Titan",          
-    Values={"Warhammer","Colossal","Beast","Attack","Female","Jaw","Armored"},          
-    Callback=function(v)          
-        SelectedTitan=v           
-        PlayClick()          
-    end          
-})          
+local ShifterImage = loadImage("shifter.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/images__18_-removebg-preview.png")
+local TitanImage   = loadImage("titan.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/noFilter.png")
+local AntiImage    = loadImage("anti.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/attackontitaneating.png")
+local BackgroundAsset = loadImage("bg.png","https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/3_20260325_141743_0002.png")
 
-TitanSection:Button({          
-    Title="Shift",          
-    Callback=function()          
-        if not SelectedTitan then return end          
-        PlayClick()          
-        ReplicatedStorage.Remotes.Titans.Transform:FireServer(SelectedTitan)          
-    end          
-})          
+local Window = WindUI:CreateWindow({
+    Title = "Aimbot GUI",
+    Icon = WindowIcon,
+    Author = "by you",
+    Folder = "AimbotGUI",
+    Size = UDim2.fromOffset(580,460),
+    Theme = "Dark",
+    Transparent = true,
+    Background = BackgroundAsset,
+    BackgroundImageTransparency = 0.5
+})
 
---------------------------------------------------          
--- ELDIAN TAB          
---------------------------------------------------          
-local AntiTab = Window:Tab({Title="Eldian",Icon=EldianIcon})          
+pcall(function()
+    Window:OnTabChanged(function()
+        PlayClick()
+    end)
+end)
 
-AntiTab:Paragraph({Title="Eldian",Desc="",Thumbnail=AntiImage})          
+local AimTab = Window:Tab({Title = "Marleyan", Icon = MainIcon})
 
-local AntiGroup = AntiTab:Group({})          
+AimTab:Paragraph({Title = "Titan Warfare",Desc = "",Thumbnail = TitanImage})
 
-local ShifterSection = AntiGroup:Section({          
-    Title="Anti Titan Shifter",          
-    Box=true,          
-    BoxBorder=true,          
-    Opened=true          
-})          
+local Settings = {Enabled=true,ESPEnabled=true,TeamCheck=true,HitPart="Head",FOV=200,ShowFOV=true}
 
-local KillAura=false          
-local DamageBoost=false          
-local ShifterESP=false          
-local Tracers=false          
-local ThunderFarm=false          
-local PlayerKillAura=false          
+AimTab:Toggle({Title="Enable Aimbot",Default=true,Callback=function(v)Settings.Enabled=v PlayClick()end})
+AimTab:Toggle({Title="Enable ESP",Default=true,Callback=function(v)Settings.ESPEnabled=v PlayClick()end})
+AimTab:Toggle({Title="Show FOV Circle",Default=true,Callback=function(v)Settings.ShowFOV=v PlayClick()end})
 
-local TweenSpeed = 0.6          
-local AutoFarmPlayers=false          
-local FarmMode="Both"          
+AimTab:Slider({
+    Title="FOV",
+    Step=1,
+    Value={Min=0,Max=400,Default=200},
+    Callback=function(v)
+        Settings.FOV=v
+        PlayClick()
+    end
+})
 
-ShifterSection:Toggle({Title="Titan Shifter Kill Aura",Callback=function(v)KillAura=v PlayClick()end})          
-ShifterSection:Toggle({Title="Damage Boost",Callback=function(v)DamageBoost=v PlayClick()end})          
-ShifterSection:Toggle({Title="Shifter ESP",Callback=function(v)ShifterESP=v PlayClick()end})          
-ShifterSection:Toggle({Title="Tracers",Callback=function(v)Tracers=v PlayClick()end})          
-ShifterSection:Toggle({Title="Thunderspear Auto Farm",Callback=function(v)ThunderFarm=v PlayClick()end})          
-ShifterSection:Toggle({Title="Player Kill Aura",Callback=function(v)PlayerKillAura=v PlayClick()end})          
+AimTab:Section({Title="Shifters"})
+AimTab:Paragraph({Title="Shifter System",Desc="",Thumbnail=ShifterImage})
 
-ShifterSection:Slider({          
-    Title="Tween Speed",          
-    Step=0.1,          
-    Value={Min=0.1,Max=2,Default=0.6},          
-    Callback=function(v)          
-        TweenSpeed=v          
-        PlayClick()          
-    end          
-})          
+local TitanSection = AimTab:Group({}):Section({Title="Titans",Box=true,BoxBorder=true,Opened=true})
 
---------------------------------------------------          
--- PLAYERS SECTION          
---------------------------------------------------          
-local PlayerSection = AntiGroup:Section({          
-    Title="Players",          
-    Box=true,          
-    BoxBorder=true,          
-    Opened=false          
-})          
+local SelectedTitan=nil
+TitanSection:Dropdown({
+    Title="Select Titan",
+    Values={"Warhammer","Colossal","Beast","Attack","Female","Jaw","Armored"},
+    Callback=function(v)
+        SelectedTitan=v
+        PlayClick()
+    end
+})
 
-PlayerSection:Toggle({          
-    Title="Auto Farm Players",          
-    Callback=function(v)          
-        AutoFarmPlayers=v          
-        PlayClick()          
-    end          
-})          
+TitanSection:Button({
+    Title="Shift",
+    Callback=function()
+        if not SelectedTitan then return end
+        PlayClick()
+        ReplicatedStorage.Remotes.Titans.Transform:FireServer(SelectedTitan)
+    end
+})
 
-PlayerSection:Dropdown({          
-    Title="Farm Mode",          
-    Values={"Players","Titans","Both"},          
-    Callback=function(v)          
-        FarmMode=v          
-        PlayClick()          
-    end          
-})          
+local AntiTab = Window:Tab({Title="Eldian",Icon=EldianIcon})
 
---------------------------------------------------          
--- MISC TAB          
---------------------------------------------------          
-local MiscTab = Window:Tab({Title="Misc",Icon=MiscIcon})    
+AntiTab:Paragraph({Title="Eldian",Desc="",Thumbnail=AntiImage})
 
-MiscTab:Paragraph({    
-    Title="Experimental",    
-    Desc="this tab is for experimental features expect some bugs if there are bugs report it to me on discord",    
-    Thumbnail=MiscIcon,    
-    Image="https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/new-official-aot-illustration-v0-buix6hq9o9zd1.png"    
-})    
+local AntiGroup = AntiTab:Group({})
 
-local MiscGroup = MiscTab:Group({})    
-local OpGroup = MiscTab:Group({Title="op"})    
+local ShifterSection = AntiGroup:Section({
+    Title="Anti Titan Shifter",
+    Box=true,
+    BoxBorder=true,
+    Opened=true
+})
 
---------------------------------------------------
--- SUPPLIES
---------------------------------------------------
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")    
+local KillAura=false
+local DamageBoost=false
+local ShifterESP=false
+local Tracers=false
+local ThunderFarm=false
+local PlayerKillAura=false
 
-local MiscGui = Instance.new("ScreenGui")    
-MiscGui.Name = "MiscButtons"    
-MiscGui.ResetOnSpawn = false    
-MiscGui.Parent = PlayerGui    
+local TweenSpeed = 0.6
+local AutoFarmPlayers=false
+local FarmMode="Both"
 
-local MedkitButton    
-local AmmoButton    
+ShifterSection:Toggle({Title="Titan Shifter Kill Aura",Callback=function(v)KillAura=v PlayClick()end})
+ShifterSection:Toggle({Title="Damage Boost",Callback=function(v)DamageBoost=v PlayClick()end})
+ShifterSection:Toggle({Title="Shifter ESP",Callback=function(v)ShifterESP=v PlayClick()end})
+ShifterSection:Toggle({Title="Tracers",Callback=function(v)Tracers=v PlayClick()end})
+ShifterSection:Toggle({Title="Thunderspear Auto Farm",Callback=function(v)ThunderFarm=v PlayClick()end})
+ShifterSection:Toggle({Title="Player Kill Aura",Callback=function(v)PlayerKillAura=v PlayClick()end})
 
-local function MakeDraggable(btn)    
-    local dragging, dragInput, startPos, startInputPos    
+ShifterSection:Slider({
+    Title="Tween Speed",
+    Step=0.1,
+    Value={Min=0.1,Max=2,Default=0.6},
+    Callback=function(v)
+        TweenSpeed=v
+        PlayClick()
+    end
+})
 
-    btn.InputBegan:Connect(function(input)    
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then    
-            dragging = true    
-            startInputPos = input.Position    
-            startPos = btn.Position    
-        end    
-    end)    
+local PlayerSection = AntiGroup:Section({
+    Title="Players",
+    Box=true,
+    BoxBorder=true,
+    Opened=false
+})
 
-    btn.InputChanged:Connect(function(input)    
-        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then    
-            dragInput = input    
-        end    
-    end)    
+PlayerSection:Toggle({
+    Title="Auto Farm Players",
+    Callback=function(v)
+        AutoFarmPlayers=v
+        PlayClick()
+    end
+})
 
-    UserInputService.InputChanged:Connect(function(input)    
-        if input == dragInput and dragging then    
-            local delta = input.Position - startInputPos    
-            btn.Position = UDim2.new(    
-                startPos.X.Scale,    
-                startPos.X.Offset + delta.X,    
-                startPos.Y.Scale,    
-                startPos.Y.Offset + delta.Y    
-            )    
-        end    
-    end)    
-end    
+PlayerSection:Dropdown({
+    Title="Farm Mode",
+    Values={"Players","Titans","Both"},
+    Callback=function(v)
+        FarmMode=v
+        PlayClick()
+    end
+})
 
-local function CreateButton(name, image)    
-    local btn = Instance.new("ImageButton")    
-    btn.Name = name    
-    btn.Size = UDim2.fromOffset(60,60)    
-    btn.Position = UDim2.fromOffset(200,200)    
-    btn.BackgroundTransparency = 1    
-    btn.Image = image    
-    btn.Parent = MiscGui    
-    MakeDraggable(btn)    
-    return btn    
-end    
+local MiscTab = Window:Tab({Title="Misc",Icon=MiscIcon})
 
-local SupplySection = MiscGroup:Section({Title="Supplys",Box=true,BoxBorder=true,Opened=true})    
+MiscTab:Paragraph({
+    Title="Experimental",
+    Desc="this tab is for experimental features expect some bugs if there are bugs report it to me on discord",
+    Thumbnail=MiscIcon,
+    Image="https://raw.githubusercontent.com/Notsoseriousscripter/Decodeinasma/refs/heads/main/new-official-aot-illustration-v0-buix6hq9o9zd1.png"
+})
+
+local MiscGroup = MiscTab:Group({})
+local OpGroup = MiscTab:Group({Title="op"})
+
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+local MiscGui = Instance.new("ScreenGui")
+MiscGui.Name = "MiscButtons"
+MiscGui.ResetOnSpawn = false
+MiscGui.Parent = PlayerGui
+
+local MedkitButton
+local AmmoButton
+
+local function MakeDraggable(btn)
+    local dragging, dragInput, startPos, startInputPos
+    btn.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            startInputPos = input.Position
+            startPos = btn.Position
+        end
+    end)
+    btn.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            local delta = input.Position - startInputPos
+            btn.Position = UDim2.new(
+                startPos.X.Scale,
+                startPos.X.Offset + delta.X,
+                startPos.Y.Scale,
+                startPos.Y.Offset + delta.Y
+            )
+        end
+    end)
+end
+
+local function CreateButton(name, image)
+    local btn = Instance.new("ImageButton")
+    btn.Name = name
+    btn.Size = UDim2.fromOffset(60,60)
+    btn.Position = UDim2.fromOffset(200,200)
+    btn.BackgroundTransparency = 1
+    btn.Image = image
+    btn.Parent = MiscGui
+    MakeDraggable(btn)
+    return btn
+end
+
+local SupplySection = MiscGroup:Section({Title="Supplys",Box=true,BoxBorder=true,Opened=true})
 
 SupplySection:Toggle({
     Title="Medkit Button",
@@ -303,9 +280,6 @@ SupplySection:Toggle({
     end
 })
 
---------------------------------------------------
--- OP / HEALTH SECTION
---------------------------------------------------
 local HealthSection = OpGroup:Section({
     Title="Health",
     Box=true,
@@ -322,13 +296,11 @@ HealthSection:Toggle({
         PlayClick()
     end
 })
-
---------------------------------------------------
--- 🔥 BACKEND SYSTEMS + FIXED LOGICS
---------------------------------------------------
+local Boxes = {}
+local Lines = {}
 
 local function IsEldian()
-    return LocalPlayer.Team and tostring(LocalPlayer.Team) == "Eldian"
+    return LocalPlayer.Team and LocalPlayer.Team.Name == "Eldian"
 end
 
 local function GetNape(plr)
@@ -355,12 +327,16 @@ local function HasTool(plr)
 end
 
 local function UseMedkit()
-    pcall(function()
-        ReplicatedStorage.Remotes.General.BuySupply:InvokeServer("Medkit")
-    end)
-
     local char = LocalPlayer.Character
     if not char then return end
+
+    local hasMedkit = char:FindFirstChild("Medkit") or LocalPlayer.Backpack:FindFirstChild("Medkit")
+
+    if not hasMedkit then
+        pcall(function()
+            ReplicatedStorage.Remotes.General.BuySupply:InvokeServer("Medkit")
+        end)
+    end
 
     local tool = char:FindFirstChild("Medkit") or LocalPlayer.Backpack:FindFirstChild("Medkit")
     if tool then
@@ -371,161 +347,141 @@ local function UseMedkit()
     end
 end
 
-local LastThrow=0
-local LastHeal=0
+local LastThrow = 0
+local LastHeal = 0
+local Tweening = false
 
 RunService.RenderStepped:Connect(function()
-    local myChar=LocalPlayer.Character
-    local myRoot=myChar and myChar:FindFirstChild("HumanoidRootPart")
+    local myChar = LocalPlayer.Character
+    local myRoot = myChar and myChar:FindFirstChild("HumanoidRootPart")
     local myHum = myChar and myChar:FindFirstChildOfClass("Humanoid")
 
-    --------------------------------------------------
-    -- ✅ SEMI GODMODE
-    --------------------------------------------------
     if SemiGod and myHum and myHum.Health > 0 then
         if myHum.Health <= (myHum.MaxHealth * 0.7) then
-            if tick() - LastHeal > 1 then
+            if tick() - LastHeal > 2 then
                 LastHeal = tick()
                 UseMedkit()
             end
         end
     end
 
-    --------------------------------------------------
-    -- ❗ ELDIAN CHECK (ALL FEATURES BELOW REQUIRE THIS)
-    --------------------------------------------------
     if not IsEldian() then return end
+    if not myRoot then return end
 
     for _,plr in ipairs(Players:GetPlayers()) do
-        if plr==LocalPlayer then continue end
-        if Settings.TeamCheck and plr.Team==LocalPlayer.Team then continue end
+        if plr == LocalPlayer then continue end
+        if Settings.TeamCheck and plr.Team == LocalPlayer.Team then continue end
 
-        local nape=GetNape(plr)
-        local char=plr.Character
-        local hitbox=char and char:FindFirstChild("PlayerHitbox")
+        local nape = GetNape(plr)
+        local char = plr.Character
+        local hitbox = char and char:FindFirstChild("PlayerHitbox")
 
-        --------------------------------------------------
-        -- SHIFTER LOGIC (FIXED TO ONLY RUN WHEN ELDIAN)
-        --------------------------------------------------
         if nape then
-            local pos,vis=Camera:WorldToViewportPoint(nape.Position)
+            local pos, vis = Camera:WorldToViewportPoint(nape.Position)
 
-            if KillAura and myRoot and (nape.Position-myRoot.Position).Magnitude<=200 then
-                ReplicatedStorage.Remotes.Blades.Hit:FireServer(nape,DamageBoost and 999 or 686)
+            if KillAura and (nape.Position - myRoot.Position).Magnitude <= 180 then
+                ReplicatedStorage.Remotes.Blades.Hit:FireServer(nape, DamageBoost and 999 or 686)
             end
 
-            if ThunderFarm and myRoot then
-                local targetPos = nape.Position - (nape.CFrame.LookVector * 80)
+            if ThunderFarm then
+                local targetPos = nape.Position - (nape.CFrame.LookVector * 60)
 
-                TweenService:Create(
-                    myRoot,
-                    TweenInfo.new(TweenSpeed),
-                    {CFrame=CFrame.new(targetPos)}
-                ):Play()
+                if not Tweening then
+                    Tweening = true
+                    local tween = TweenService:Create(
+                        myRoot,
+                        TweenInfo.new(TweenSpeed, Enum.EasingStyle.Linear),
+                        {CFrame = CFrame.new(targetPos)}
+                    )
+                    tween:Play()
+                    tween.Completed:Wait()
+                    Tweening = false
+                end
 
-                if tick() - LastThrow >= 0.25 then
+                if tick() - LastThrow >= 0.35 then
                     LastThrow = tick()
-
                     ReplicatedStorage.Remotes.Thunderspear.Refill:FireServer()
-
-                    local cf = CFrame.new(nape.Position)
-                    ReplicatedStorage.Remotes.Thunderspear.Throw:FireServer("Left",cf)
+                    ReplicatedStorage.Remotes.Thunderspear.Throw:FireServer("Left", CFrame.new(nape.Position))
                 end
             end
 
-            if ShifterESP and vis and char and char.Parent and nape.Parent then
+            if ShifterESP and vis then
                 if not Boxes[plr] then
-                    local b=Drawing.new("Square")
-                    b.Color=Color3.fromRGB(170,0,255)
-                    b.Thickness=2
-                    b.Filled=false
-                    Boxes[plr]=b
+                    local b = Drawing.new("Square")
+                    b.Color = Color3.fromRGB(170,0,255)
+                    b.Thickness = 2
+                    b.Filled = false
+                    Boxes[plr] = b
                 end
 
-                local size=3000/pos.Z
-                local b=Boxes[plr]
-                b.Size=Vector2.new(size,size*1.5)
-                b.Position=Vector2.new(pos.X-size/2,pos.Y-size/1.5)
-                b.Visible=true
+                local size = 2500 / pos.Z
+                local b = Boxes[plr]
+                b.Size = Vector2.new(size, size * 1.4)
+                b.Position = Vector2.new(pos.X - size/2, pos.Y - size/1.2)
+                b.Visible = true
             else
-                if Boxes[plr] then Boxes[plr].Visible=false end
+                if Boxes[plr] then Boxes[plr].Visible = false end
             end
 
-            if Tracers and vis and char and char.Parent then
+            if Tracers and vis then
                 if not Lines[plr] then
-                    local l=Drawing.new("Line")
-                    l.Color=Color3.fromRGB(170,0,255)
-                    l.Thickness=1
-                    Lines[plr]=l
+                    local l = Drawing.new("Line")
+                    l.Color = Color3.fromRGB(170,0,255)
+                    l.Thickness = 1
+                    Lines[plr] = l
                 end
 
-                local l=Lines[plr]
-                l.From=Vector2.new(Camera.ViewportSize.X/2,Camera.ViewportSize.Y)
-                l.To=Vector2.new(pos.X,pos.Y)
-                l.Visible=true
+                local l = Lines[plr]
+                l.From = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y)
+                l.To = Vector2.new(pos.X, pos.Y)
+                l.Visible = true
             else
-                if Lines[plr] then Lines[plr].Visible=false end
+                if Lines[plr] then Lines[plr].Visible = false end
             end
         else
-            if Boxes[plr] then Boxes[plr].Visible=false end
-            if Lines[plr] then Lines[plr].Visible=false end
+            if Boxes[plr] then Boxes[plr].Visible = false end
+            if Lines[plr] then Lines[plr].Visible = false end
         end
 
-        --------------------------------------------------
-        -- PLAYER KILL AURA
-        --------------------------------------------------
-        if PlayerKillAura and myRoot and char and hitbox then
-            if (hitbox.Position - myRoot.Position).Magnitude <= 150 then
-                ReplicatedStorage.Remotes.Blades.Hit:FireServer(hitbox,999)
-            end
+        if PlayerKillAura and hitbox and (hitbox.Position - myRoot.Position).Magnitude <= 140 then
+            ReplicatedStorage.Remotes.Blades.Hit:FireServer(hitbox, 999)
         end
 
-        --------------------------------------------------
-        -- PLAYER AUTOFARM
-        --------------------------------------------------
-        if AutoFarmPlayers and myRoot and char and hitbox and HasTool(plr) then
-            if FarmMode=="Players" or FarmMode=="Both" then
-                TweenService:Create(
+        if AutoFarmPlayers and char and hitbox and HasTool(plr) then
+            if FarmMode == "Players" or FarmMode == "Both" then
+                local tween = TweenService:Create(
                     myRoot,
-                    TweenInfo.new(TweenSpeed),
-                    {CFrame=hitbox.CFrame}
-                ):Play()
-
-                ReplicatedStorage.Remotes.Blades.Hit:FireServer(hitbox,999)
+                    TweenInfo.new(TweenSpeed, Enum.EasingStyle.Linear),
+                    {CFrame = hitbox.CFrame * CFrame.new(0,0,3)}
+                )
+                tween:Play()
+                ReplicatedStorage.Remotes.Blades.Hit:FireServer(hitbox, 999)
             end
         end
 
-        --------------------------------------------------
-        -- TITAN AUTOFARM
-        --------------------------------------------------
         if AutoFarmPlayers and nape then
-            if FarmMode=="Titans" or FarmMode=="Both" then
-                TweenService:Create(
+            if FarmMode == "Titans" or FarmMode == "Both" then
+                local tween = TweenService:Create(
                     myRoot,
-                    TweenInfo.new(TweenSpeed),
-                    {CFrame=nape.CFrame}
-                ):Play()
-
-                ReplicatedStorage.Remotes.Blades.Hit:FireServer(nape,999)
+                    TweenInfo.new(TweenSpeed, Enum.EasingStyle.Linear),
+                    {CFrame = nape.CFrame * CFrame.new(0,0,3)}
+                )
+                tween:Play()
+                ReplicatedStorage.Remotes.Blades.Hit:FireServer(nape, 999)
             end
         end
     end
 end)
 
---------------------------------------------------
--- 🔥 INFINITE SPEAR ONLY
---------------------------------------------------
 task.spawn(function()
     while true do
         task.wait(0.3)
-        if InfSpear then
+        if InfSpear and IsEldian() then
             ReplicatedStorage.Remotes.Thunderspear.Refill:FireServer()
         end
     end
 end)
---------------------------------------------------
--- AIMBOT + ESP
---------------------------------------------------
+
 local function GetCursor()
     return UserInputService.TouchEnabled and (Camera.ViewportSize/2) or UserInputService:GetMouseLocation()
 end
